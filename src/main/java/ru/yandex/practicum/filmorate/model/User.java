@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Email;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import java.time.LocalDate;
 
 @Data
 public class User {
 
     private int id;
-
     @Email
     private String email;
 
