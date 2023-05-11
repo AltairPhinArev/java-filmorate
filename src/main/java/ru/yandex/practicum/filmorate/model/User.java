@@ -18,5 +18,5 @@ public class User {
     private String name;
 
     private LocalDate birthday;
-    
+
 }

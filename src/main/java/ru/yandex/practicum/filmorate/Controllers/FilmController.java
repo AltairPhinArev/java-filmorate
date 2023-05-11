@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 public class FilmController {
 
-    private int FilmId = 1;
+    private int filmId = 1;
     private static final Logger log = LogManager.getLogger(Film.class);
     private final List<Film> films = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class FilmController {
     @PostMapping(value = "/films")
     public void createUser(@RequestBody Film film) {
         validate(film);
-        film.setId(FilmId++);
+        film.setId(filmId++);
         films.add(film);
     }
 
@@ -46,6 +46,7 @@ public class FilmController {
             throw new ValidationException();
         }
     }
+
     @PutExchange(value = "/films")
     public void updateUser(@RequestBody Film film) {
         Film updatedFilm = films.get(film.getId());

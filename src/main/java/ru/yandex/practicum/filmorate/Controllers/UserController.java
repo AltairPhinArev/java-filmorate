@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 @RestController
 public class UserController {
 
-    private int UserId = 1;
+    private int userId = 1;
     private static final Logger log = LogManager.getLogger(User.class);
     private final List<User> users = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping(value = "/users")
     public void createUser(@RequestBody User user) {
         validate(user);
-        user.setId(UserId++);
+        user.setId(userId++);
         users.add(user);
     }
 
