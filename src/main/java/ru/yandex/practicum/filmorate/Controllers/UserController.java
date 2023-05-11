@@ -35,7 +35,7 @@ public class UserController {
     private User validate(User user) {
         if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
                 !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
-            if(user.getName() == null || user.getName().isBlank()) {
+            if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
             return user;
