@@ -1,16 +1,12 @@
 package ru.yandex.practicum.filmorate.Controllers;
 
-import org.springframework.web.service.annotation.PutExchange;
+import org.springframework.web.bind.annotation.*;
+
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,32 +26,33 @@ public class FilmController {
     }
 
     @PostMapping(value = "/films")
-    public void createUser(@RequestBody Film film) {
+    public Film createFilm (@RequestBody Film film) {
         validate(film);
         film.setId(filmId++);
         films.add(film);
+        return film;
     }
 
     private Film validate(Film film) {
         if (film.getName() != null &&
+                !film.getName().isEmpty() &&
                 film.getReleaseDate().isAfter(LocalDate.of(1895, 1, 28)) &&
                 film.getDescription().length() < 200 &&
-                !film.getDuration().isNegative()) {
-            return new Film();
+                film.getDuration() > -1) {
+            return film;
         } else {
-            throw new ValidationException();
+            throw new ValidationException("Данные не верно указаны");
         }
     }
 
-    @PutExchange(value = "/films")
-    public void updateUser(@RequestBody Film film) {
-        Film updatedFilm = films.get(film.getId());
-        validate(updatedFilm);
-        updatedFilm.setName(film.getName());
-        updatedFilm.setDescription(film.getDescription());
-        updatedFilm.setReleaseDate(film.getReleaseDate());
-        updatedFilm.setDuration(film.getDuration());
-
-        films.set(film.getId(), updatedFilm);
+    @PutMapping(value = "/films")
+    public Film updateUser(@RequestBody Film film) {
+        if (filmId < film.getId()) {
+            throw new ValidationException("Такого фильма пока нет(");
+        } else {
+            validate(film);
+            films.set(film.getId() - 1, film);
+            return film;
+        }
     }
 }
