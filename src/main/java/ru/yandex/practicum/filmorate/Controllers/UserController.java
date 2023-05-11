@@ -8,8 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +46,7 @@ public class UserController {
     }
 
     @PutExchange(value = "/post/updateUser")
-    public void updateUser(@RequestBody @NotNull User user) {
+    public void updateUser(@RequestBody User user) {
         User existingUser = users.get(user.getId());
         validate(existingUser);
         existingUser.setName(user.getName());
