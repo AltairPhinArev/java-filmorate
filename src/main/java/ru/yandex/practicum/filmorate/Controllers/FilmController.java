@@ -50,6 +50,7 @@ public class FilmController {
         if (filmId < film.getId()) {
             throw new ValidationException("Такого фильма пока нет(");
         } else {
+            
             validate(film);
             films.set(film.getId() - 1, film);
             return film;
