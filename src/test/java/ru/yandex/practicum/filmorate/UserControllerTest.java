@@ -49,7 +49,7 @@ public class UserControllerTest {
     @Test
     public void shouldCreateNotCreateUserWithEmptyEmail() {
         User user = new User("", null, "",
-                LocalDate.of(1999, 10 ,10));
+                LocalDate.of(1999, 10, 10));
         Assertions.assertThrows(ValidationException.class, () -> {
             userController.createUser(user);
         });
@@ -70,6 +70,6 @@ public class UserControllerTest {
                 LocalDate.of(1999, 10, 10));
         user.setId(1);
 
-        Assertions.assertEquals(user , userController.createUser(user));
+        Assertions.assertEquals(user, userController.createUser(user));
     }
 }
