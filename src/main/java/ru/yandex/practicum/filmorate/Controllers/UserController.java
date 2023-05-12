@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
         private int userId = 1;
         private static final Logger log = LogManager.getLogger(User.class);
-        private final HashMap<Integer , User> userMap = new HashMap<>();
+        private final HashMap<Integer, User> userMap = new HashMap<>();
 
         @GetMapping(value = "/users")
         public Collection<User> findAll() {
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
         public User createUser(@RequestBody User user) {
             validate(user);
             user.setId(userId++);
-            userMap.put(userId - 1 , user);
+            userMap.put(userId - 1, user);
             log.info("Пользователь успшно добавлен");
             return user;
         }
@@ -39,7 +39,7 @@ import org.apache.logging.log4j.Logger;
             } else {
                 validate(user);
                 userMap.put(user.getId(), user);
-                log.info("Данные пользователя обновлены с id {}" , user.getId());
+                log.info("Данные пользователя обновлены с id {}", user.getId());
                 return user;
             }
         }
