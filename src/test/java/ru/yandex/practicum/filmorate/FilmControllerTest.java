@@ -51,13 +51,13 @@ public class FilmControllerTest {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(2000, 10, 10), 1);
         film.setId(1);
-        Assertions.assertEquals(film , filmController.createFilm(film));
+        Assertions.assertEquals(film, filmController.createFilm(film));
     }
 
     @Test
     public void shouldNotCreateFilmWithEmptyName() {
         Film film = new Film("", "Galactic war",
-                LocalDate.of(2000, 10 , 10), 12);
+                LocalDate.of(2000, 10, 10), 12);
         Assertions.assertThrows(ValidationException.class, () -> {
             filmController.createFilm(film);
         });
