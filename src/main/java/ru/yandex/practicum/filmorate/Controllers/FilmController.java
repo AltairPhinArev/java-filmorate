@@ -42,11 +42,12 @@ public class FilmController {
         }
     }
 
-    private void validate(Film film) {
+    private Film validate(Film film) {
         if (film.getName() != null &&
                 !film.getName().isEmpty() &&
                 film.getReleaseDate().isAfter(LocalDate.of(1895, 1, 28)) &&
-                film.getDescription().length() < 200 && film.getDuration() > 0){
+                film.getDescription().length() < 200 && film.getDuration() > 0) {
+            return film;
         } else {
             log.error("Не верно укзаны данные фильма");
             throw new ValidationException();
