@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
         @GetMapping(value = "/users")
         public Collection<User> findAll() {
-            log.info("Текущее количество юзеров {}", userById.size());
+            log.info("Current number of users {}", userById.size());
             return userById.values();
         }
 
@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
             validate(user);
             user.setId(userId++);
             userById.put(user.getId(), user);
-            log.info("Пользователь успшно добавлен");
+            log.info("User has been created successful");
             return user;
         }
 
@@ -41,7 +41,7 @@ import org.apache.logging.log4j.Logger;
             } else {
                 validate(user);
                 userById.put(user.getId(), user);
-                log.info("Данные пользователя обновлены с id {}", user.getId());
+                log.info("User has been updated with id {}", user.getId());
                 return user;
             }
         }
@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
                     }
                     return user;
             } else {
-                    log.error("Не верно укзаны данные Пользователя");
+                    log.error("Illegal arguments for user");
                     throw new ValidationException();
                 }
             }

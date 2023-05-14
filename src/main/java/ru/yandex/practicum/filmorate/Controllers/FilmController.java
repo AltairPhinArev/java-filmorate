@@ -17,7 +17,7 @@ public class FilmController {
 
     @GetMapping(value = "/films")
     public Collection<Film> findAll() {
-        log.info("Текущее количество фильмов {}", filmById.size());
+        log.info("Current number of films {}", filmById.size());
         return filmById.values();
     }
 
@@ -26,7 +26,7 @@ public class FilmController {
         validate(film);
         film.setId(filmId++);
         filmById.put(film.getId(), film);
-        log.info("Фильм успшно добавлен");
+        log.info("Film has been crated successful");
         return film;
     }
 
@@ -37,7 +37,7 @@ public class FilmController {
         } else {
             validate(film);
             filmById.put(film.getId(), film);
-            log.info("Фильм успешно обнавлен с id {}", film.getId());
+            log.info("Film has been updated with id {}", film.getId());
             return film;
         }
     }
@@ -49,7 +49,7 @@ public class FilmController {
                 film.getDescription().length() < 200 && film.getDuration() > 0) {
             return film;
         } else {
-            log.error("Не верно укзаны данные фильма");
+            log.error("Illegal arguments for film");
             throw new ValidationException();
         }
     }
