@@ -37,8 +37,7 @@ public class FilmService {
     }
 
     public List<Film> rateFilm(int count) {
-        List<Film> popularFilms = new ArrayList<>(ratedFilms); // Копируем HashSet в список
-
+        List<Film> popularFilms = new ArrayList<>(ratedFilms);
         popularFilms.sort(Comparator.comparingInt(Film::getScore));
 
         return popularFilms.subList(0, Math.min(count, popularFilms.size()));
@@ -46,7 +45,9 @@ public class FilmService {
 
     public void deleteLike(Film film , Long userId) {
         if(films.containsKey(userId) && films.containsValue(film)) {
-            films.remove(userId);
+            if(films.get(userId).getScore() > 0) {
+                films.get(userId).setScore(films.get(userId).getScore() - 1);
+            }
         } else {
             throw new UserOrFilmNotFoundException("Illegal arguments for remove like");
         }

@@ -23,7 +23,7 @@ public class FilmController {
 
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService filmService , UserStorage userStorage) {
+    public FilmController(FilmStorage filmStorage, FilmService filmService, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.filmService = filmService;
         this.userStorage = userStorage;
@@ -72,7 +72,7 @@ public class FilmController {
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.deleteLike(filmStorage.getFilmById(id) , userId);
+        filmService.deleteLike(filmStorage.getFilmById(id), userId);
     }
 
     @ExceptionHandler
