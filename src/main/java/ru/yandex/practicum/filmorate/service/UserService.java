@@ -3,12 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -25,15 +27,15 @@ public class UserService {
         }
     }
 
-    public ArrayList<Integer> findAllFriend(User user) {
+    public Set<Long> findAllFriend(User user) {
         return user.getFriends();
     }
 
-    public ArrayList<Integer> findCommonFriends(User user , User friendUser) {
-        ArrayList<Integer> commonFriends = new ArrayList<>();
+    public Set<Long> findCommonFriends(User user , User friendUser) {
+        Set<Long> commonFriends = new HashSet<>();
 
-        for(Integer friendId : user.getFriends()) {
-            for(Integer commonFriendId : friendUser.getFriends()) {
+        for(Long friendId : user.getFriends()) {
+            for(Long commonFriendId : friendUser.getFriends()) {
                 if (Objects.equals(friendId, commonFriendId)) {
                     commonFriends.add(commonFriendId);
                 } else {
@@ -46,7 +48,7 @@ public class UserService {
 
     public void deleteFromFriends(User user , User otherUser) {
         if (user.getFriends().size() == 0 || otherUser.getFriends().size() == 0) {
-            throw  new ValidationException("Users not friends");
+            throw new ValidationException(HttpStatus.BAD_REQUEST.toString());
         } else {
             user.getFriends().remove(otherUser.getId());
             otherUser.getFriends().remove(user.getId());

@@ -6,10 +6,15 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface UserStorage {
+
     Collection<User> findAll();
+
     User createUser(User film);
+
     User updateUser(User film);
-    User getUserById(int id);
-    void deleteUserById(int id);
+
+    User getUserById(Long id);
+
+    void deleteUserById(Long id);
 }
 

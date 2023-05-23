@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.Controllers.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -21,7 +22,9 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        userController = new UserController(userStorage);
+        userStorage = new InMemoryUserStorage();
+        userService = new UserService();
+        userController = new UserController(userStorage , userService);
     }
 
     @Test

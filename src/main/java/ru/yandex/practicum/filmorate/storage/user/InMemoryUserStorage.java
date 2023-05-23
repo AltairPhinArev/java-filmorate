@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -16,9 +17,9 @@ import java.util.HashMap;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private int userId = 1;
+    private Long userId = 1L;
     private static final Logger log = LogManager.getLogger(User.class);
-    private final HashMap<Integer, User> userById = new HashMap<>();
+    private final HashMap<Long, User> userById = new HashMap<>();
 
     @Override
     public Collection<User> findAll() {
@@ -38,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(@RequestBody User user) {
         if (!userById.containsKey(user.getId())) {
-            throw new ValidationException("Cannot find User");
+            throw new ValidationException("Can't find User");
         } else {
             validate(user);
             userById.put(user.getId(), user);
@@ -48,20 +49,20 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUserById(int id) {
+    public void deleteUserById(Long id) {
         if (userById.containsKey(id)) {
             userById.remove(id);
         } else {
-            throw new ValidationException("Cannot find User");
+            throw new ValidationException("Can't find User");
         }
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getUserById(Long id) {
         if (userById.containsKey(id)) {
             return userById.get(id);
         } else {
-            throw new ValidationException("Cannot find User");
+            throw new UserOrFilmNotFoundException("Can't find User");
         }
     }
 

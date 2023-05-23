@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -14,9 +15,9 @@ import java.util.HashMap;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private int filmId = 1;
+    private Long filmId = 1L;
     private static final Logger log = LogManager.getLogger(Film.class);
-    private final HashMap<Integer, Film> filmById = new HashMap<>();
+    private final HashMap<Long, Film> filmById = new HashMap<>();
 
     @Override
     public Collection<Film> findAll() {
@@ -46,16 +47,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(int id) {
+    public Film getFilmById(Long id) {
         if (filmById.containsKey(id)) {
             return filmById.get(id);
         } else {
-            throw new ValidationException("Cannot find film with this id");
+            throw new UserOrFilmNotFoundException("Cannot find film with this id");
         }
     }
 
     @Override
-    public void deleteFilmById(int id) {
+    public void deleteFilmById(Long id) {
         if (filmById.containsKey(id)) {
             filmById.remove(id);
         } else {
