@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @RestController
@@ -41,14 +42,13 @@ public class FilmController {
 
     @GetMapping(value = "/films/popular")
     public List<Film> getMostPopularFilm() {
-        return filmService.rateFilm(10);
+        return filmService.getAllRatedFilms();
     }
 
     @GetMapping(value = "/films/popular?count={count}")
     public List<Film> getMostPopularFilmByCount(@PathVariable int count) {
-        return filmService.rateFilm(count);
+        return filmService.getRateFilmsByCount(count);
     }
-
 
     @PostMapping(value = "/films")
     public Film createFilm(@RequestBody Film film) {
@@ -75,7 +75,7 @@ public class FilmController {
         filmService.deleteLike(filmStorage.getFilmById(id), userId);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserOrFilmNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpStatus handleNegativeCount(final UserOrFilmNotFoundException e) {
         return HttpStatus.NOT_FOUND;

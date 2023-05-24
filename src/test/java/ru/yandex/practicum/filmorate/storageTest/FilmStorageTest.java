@@ -1,12 +1,11 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.storageTest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import ru.yandex.practicum.filmorate.Controllers.FilmController;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.Controllers.FilmController;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
@@ -14,9 +13,8 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
 
-public class FilmControllerTest {
+public class FilmStorageTest {
 
     FilmController filmController;
     FilmService filmService;
@@ -25,7 +23,7 @@ public class FilmControllerTest {
 
     @BeforeEach
     public void setUp() {
-        filmService = new FilmService();
+       // filmService = new FilmService();
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         filmController = new FilmController(filmStorage , filmService , userStorage);
@@ -62,7 +60,7 @@ public class FilmControllerTest {
     public void shouldCreateFilm() {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(2000, 10, 10), 1);
-        film.setId(1);
+        film.setId(1L);
         Assertions.assertEquals(film, filmController.createFilm(film));
     }
 
@@ -83,6 +81,5 @@ public class FilmControllerTest {
             filmController.createFilm(film);
         });
     }
-
-
 }
+

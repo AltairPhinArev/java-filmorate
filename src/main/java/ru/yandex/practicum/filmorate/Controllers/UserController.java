@@ -19,7 +19,7 @@ public class UserController {
     UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage , UserService userService) {
+    public UserController(UserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
@@ -36,7 +36,7 @@ public class UserController {
 
     @GetMapping(value = "/users/{id}/friends")
     public ArrayList<User> findAllFriends(@PathVariable Long id) {
-        ArrayList <User> friends = new ArrayList<>();
+        ArrayList<User> friends = new ArrayList<>();
         for (Long friendId : userService.findAllFriend(userStorage.getUserById(id))) {
             friends.add(userStorage.getUserById(friendId));
         }
@@ -46,7 +46,7 @@ public class UserController {
     @GetMapping(value = "/users/{id}/friends/common/{otherId}")
     public ArrayList<User> findCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
        ArrayList<User> commonFriends = new ArrayList<>();
-       for(Long commonId :
+       for (Long commonId :
         userService.findCommonFriends(userStorage.getUserById(id), userStorage.getUserById(otherId))) {
            commonFriends.add(userStorage.getUserById(commonId));
         }
@@ -65,12 +65,12 @@ public class UserController {
 
     @PutMapping(value = "/users/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        userService.createFriend(userStorage.getUserById(id) , userStorage.getUserById(friendId));
+        userService.createFriend(userStorage.getUserById(id), userStorage.getUserById(friendId));
     }
 
     @DeleteMapping(value = "/users/{id}/friends/{friendId}")
     public void deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        userService.deleteFromFriends(userStorage.getUserById(id) , userStorage.getUserById(friendId));
+        userService.deleteFromFriends(userStorage.getUserById(id), userStorage.getUserById(friendId));
     }
 
     @DeleteMapping(value = "/users/{id}")
@@ -78,7 +78,7 @@ public class UserController {
         userStorage.deleteUserById(id);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserOrFilmNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpStatus handleNegativeCount(final UserOrFilmNotFoundException e) {
         return HttpStatus.NOT_FOUND;

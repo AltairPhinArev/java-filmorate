@@ -21,7 +21,7 @@ public class UserService {
         if ((user != null && userFriend != null && user.getId() != userFriend.getId())) {
             user.getFriends().add(userFriend.getId());
             userFriend.getFriends().add(user.getId());
-            log.info("FreandShip has been created");
+            log.info("FriendShip has been created");
         } else {
             throw new ValidationException("Cannot find User");
         }
