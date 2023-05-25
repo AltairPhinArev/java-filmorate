@@ -8,9 +8,13 @@ import java.util.Map;
 public interface UserStorage {
 
     Collection<User> findAll();
+
     User createUser(User film);
+
     User updateUser(User film);
+
     User getUserById(Long id);
+
     void deleteUserById(Long id);
 }
 
