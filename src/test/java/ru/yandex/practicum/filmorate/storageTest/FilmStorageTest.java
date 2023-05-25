@@ -23,10 +23,9 @@ public class FilmStorageTest {
 
     @BeforeEach
     public void setUp() {
-       // filmService = new FilmService();
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
-        filmController = new FilmController(filmStorage , filmService , userStorage);
+        filmController = new FilmController(filmStorage , filmService);
     }
 
     @Test

@@ -7,11 +7,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class User {
 
-    private Set<Long> friends = new HashSet<>();
+    private Set<Long> friends = new TreeSet<>();
 
     private Long id;
 

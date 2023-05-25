@@ -22,7 +22,7 @@ public class UserStorageTest {
     @BeforeEach
     public void setUp() {
         userStorage = new InMemoryUserStorage();
-        userService = new UserService();
+        userService = new UserService(userStorage);
         userController = new UserController(userStorage , userService);
     }
 

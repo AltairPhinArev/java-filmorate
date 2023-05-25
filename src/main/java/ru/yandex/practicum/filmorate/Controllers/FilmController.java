@@ -20,14 +20,12 @@ public class FilmController {
 
     private final FilmStorage filmStorage;
     private final FilmService filmService;
-    private final UserStorage userStorage;
 
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService filmService, UserStorage userStorage) {
+    public FilmController(FilmStorage filmStorage, FilmService filmService) {
         this.filmStorage = filmStorage;
         this.filmService = filmService;
-        this.userStorage = userStorage;
     }
 
     @GetMapping(value = "/films")
@@ -41,12 +39,7 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films/popular")
-    public List<Film> getMostPopularFilm() {
-        return filmService.getAllRatedFilms();
-    }
-
-    @GetMapping(value = "/films/popular?count={count}")
-    public List<Film> getMostPopularFilmByCount(@PathVariable int count) {
+    public List<Film> getMostPopularFilmByCount(@RequestParam (defaultValue = "10") Integer count) {
         return filmService.getRateFilmsByCount(count);
     }
 
@@ -62,7 +55,7 @@ public class FilmController {
 
     @PutMapping(value = "/films/{id}/like/{userId}")
     public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.addLike(filmStorage.getFilmById(id), userStorage.getUserById(userId));
+        filmService.addLike(id, userId);
     }
 
     @DeleteMapping(value = "/films/{id}")
@@ -72,7 +65,7 @@ public class FilmController {
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.deleteLike(filmStorage.getFilmById(id), userId);
+        filmService.deleteLike(id, userId);
     }
 
     @ExceptionHandler(UserOrFilmNotFoundException.class)

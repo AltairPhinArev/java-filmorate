@@ -10,8 +10,6 @@ import java.util.Set;
 @Data
 public class Film {
 
-    private int size;
-
     private Long id;
 
     private String name;
@@ -26,9 +24,6 @@ public class Film {
 
     private final Set<Long> voytedUsers = new HashSet<>();
 
-    public int getSize() {
-        return getVoytedUsers().size();
-    }
 
     public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;
@@ -36,13 +31,5 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
     }
-    /*
-    public Film(String name, String description, LocalDate releaseDate, int duration, ArrayList<Integer> isLiked) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.isLiked = isLiked;
-    }
-     */
+
 }

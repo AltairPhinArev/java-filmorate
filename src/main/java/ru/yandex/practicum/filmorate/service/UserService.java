@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -15,9 +16,17 @@ import java.util.Set;
 @Service
 public class UserService {
 
+    UserStorage userStorage;
+
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
     private static final Logger log = LogManager.getLogger(User.class);
 
-    public void createFriend(User user , User userFriend) {
+    public void createFriend(Long userId , Long userFriendId) {
+        User user = userStorage.getUserById(userId);
+        User userFriend = userStorage.getUserById(userFriendId);
         if ((user != null && userFriend != null && user.getId() != userFriend.getId())) {
             user.getFriends().add(userFriend.getId());
             userFriend.getFriends().add(user.getId());
