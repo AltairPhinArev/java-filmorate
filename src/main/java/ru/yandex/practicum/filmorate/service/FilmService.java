@@ -30,7 +30,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public void addLike(Long filmId , Long userId) {
+    public void addLike(Long filmId, Long userId) {
         for (Film filmIds : filmStorage.findAll()) {
             ratedFilmsIds.add(filmIds.getId());
         }
