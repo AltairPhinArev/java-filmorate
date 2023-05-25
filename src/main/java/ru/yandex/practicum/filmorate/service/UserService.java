@@ -24,7 +24,7 @@ public class UserService {
 
     private static final Logger log = LogManager.getLogger(User.class);
 
-    public void createFriend(Long userId , Long userFriendId) {
+    public void createFriend(Long userId, Long userFriendId) {
         User user = userStorage.getUserById(userId);
         User userFriend = userStorage.getUserById(userFriendId);
         if ((user != null && userFriend != null && user.getId() != userFriend.getId())) {
@@ -40,11 +40,11 @@ public class UserService {
         return user.getFriends();
     }
 
-    public Set<Long> findCommonFriends(User user , User friendUser) {
+    public Set<Long> findCommonFriends(User user, User friendUser) {
         Set<Long> commonFriends = new HashSet<>();
 
-        for(Long friendId : user.getFriends()) {
-            for(Long commonFriendId : friendUser.getFriends()) {
+        for (Long friendId : user.getFriends()) {
+            for (Long commonFriendId : friendUser.getFriends()) {
                 if (Objects.equals(friendId, commonFriendId)) {
                     commonFriends.add(commonFriendId);
                 } else {
@@ -55,7 +55,7 @@ public class UserService {
         return commonFriends;
     }
 
-    public void deleteFromFriends(User user , User otherUser) {
+    public void deleteFromFriends(User user, User otherUser) {
         if (user.getFriends().size() == 0 || otherUser.getFriends().size() == 0) {
             throw new ValidationException(HttpStatus.BAD_REQUEST.toString());
         } else {
