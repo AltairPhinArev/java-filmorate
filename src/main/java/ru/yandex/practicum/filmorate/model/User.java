@@ -4,11 +4,16 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class User {
 
-    private int id;
+    private Set<Long> friends = new TreeSet<>();
+
+    private Long id;
+
     @Email
     private String email;
 

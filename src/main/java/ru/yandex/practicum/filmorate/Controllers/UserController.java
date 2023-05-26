@@ -1,61 +1,74 @@
 package ru.yandex.practicum.filmorate.Controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+@RestController
+public class UserController {
 
-    @RestController
-    public class UserController {
+    UserService userService;
 
-        private int userId = 1;
-        private static final Logger log = LogManager.getLogger(User.class);
-        private final HashMap<Integer, User> userById = new HashMap<>();
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-        @GetMapping(value = "/users")
-        public Collection<User> findAll() {
-            log.info("Текущее количество юзеров {}", userById.size());
-            return userById.values();
-        }
+    @GetMapping(value = "/users")
+    public Collection<User> findAllUsers() {
+        return userService.findAllUsers();
+    }
 
-        @PostMapping(value = "/users")
-        public User createUser(@RequestBody User user) {
-            validate(user);
-            user.setId(userId++);
-            userById.put(user.getId(), user);
-            log.info("Пользователь успшно добавлен");
-            return user;
-        }
+    @GetMapping(value = "/users/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
 
-        @PutMapping(value = "/users")
-        public User updateUser(@RequestBody User user) {
-            if (!userById.containsKey(user.getId())) {
-                throw new ValidationException();
-            } else {
-                validate(user);
-                userById.put(user.getId(), user);
-                log.info("Данные пользователя обновлены с id {}", user.getId());
-                return user;
-            }
-        }
+    @GetMapping(value = "/users/{id}/friends")
+    public List<User> findAllFriends(@PathVariable Long id) {
+        return userService.findAllFriend(id);
+    }
 
-        private User validate(User user) {
-            if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
-                    !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
-                    if (user.getName() == null || user.getName().isBlank()) {
-                        user.setName(user.getLogin());
-                    }
-                    return user;
-            } else {
-                    log.error("Не верно укзаны данные Пользователя");
-                    throw new ValidationException();
-                }
-            }
-        }
+    @GetMapping(value = "/users/{id}/friends/common/{otherId}")
+    public List<User> findCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.findCommonFriends(id, otherId);
+    }
+
+    @PostMapping(value = "/users")
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
+    }
+
+    @PutMapping(value = "/users")
+    public User updateUser(@RequestBody User user) {
+        return userService.updateUser(user);
+    }
+
+    @PutMapping(value = "/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.createFriend(id, friendId);
+    }
+
+    @DeleteMapping(value = "/users/{id}/friends/{friendId}")
+    public void deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.deleteFromFriends(id, friendId);
+    }
+
+    @DeleteMapping(value = "/users/{id}")
+    public void deleteUserById(@PathVariable Long id) {
+        userService.deleteUserById(id);
+    }
+
+    @ExceptionHandler(UserOrFilmNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public HttpStatus handleNegativeCount(final UserOrFilmNotFoundException e) {
+        return HttpStatus.NOT_FOUND;
+    }
+}
