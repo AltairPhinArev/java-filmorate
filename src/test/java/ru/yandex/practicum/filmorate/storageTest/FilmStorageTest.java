@@ -33,7 +33,7 @@ public class FilmStorageTest {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(1700, 10, 10), 10);
         Assertions.assertThrows(ValidationException.class, () -> {
-            filmController.createFilm(film);
+            filmStorage.createFilm(film);
         });
     }
 
@@ -42,7 +42,7 @@ public class FilmStorageTest {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(2000, 10, 10), 0);
         Assertions.assertThrows(ValidationException.class, () -> {
-            filmController.createFilm(film);
+            filmStorage.createFilm(film);
         });
     }
 
@@ -51,7 +51,7 @@ public class FilmStorageTest {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(2000, 10, 10), 0);
         Assertions.assertThrows(ValidationException.class, () -> {
-            filmController.createFilm(film);
+            filmStorage.createFilm(film);
         });
     }
 
@@ -60,7 +60,7 @@ public class FilmStorageTest {
         Film film = new Film("Star-Wars", "Galactic war",
                 LocalDate.of(2000, 10, 10), 1);
         film.setId(1L);
-        Assertions.assertEquals(film, filmController.createFilm(film));
+        Assertions.assertEquals(film, filmStorage.createFilm(film));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class FilmStorageTest {
         Film film = new Film("", "Galactic war",
                 LocalDate.of(2000, 10, 10), 12);
         Assertions.assertThrows(ValidationException.class, () -> {
-            filmController.createFilm(film);
+            filmStorage.createFilm(film);
         });
     }
 
@@ -77,7 +77,7 @@ public class FilmStorageTest {
         Film film = new Film(null, "Galactic war",
                 LocalDate.of(2000, 10, 10), 12);
         Assertions.assertThrows(ValidationException.class, () -> {
-            filmController.createFilm(film);
+            filmStorage.createFilm(film);
         });
     }
 }
