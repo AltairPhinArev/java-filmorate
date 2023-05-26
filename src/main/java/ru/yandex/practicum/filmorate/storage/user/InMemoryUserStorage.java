@@ -32,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
         validate(user);
         user.setId(userId++);
         userById.put(user.getId(), user);
-        log.info("User has been created successful");
+        log.info(user.getName() + ", has been created successful with id {}", user.getId());
         return user;
     }
 
@@ -43,7 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
         } else {
             validate(user);
             userById.put(user.getId(), user);
-            log.info("User has been updated with id {}", user.getId());
+            log.info(user.getName() + " has been updated with id {}", user.getId());
             return user;
         }
     }

@@ -69,8 +69,8 @@ public class UserServiceTest {
 
 
         Long commonUserId = 0L;
-        for (Long id : userService.findCommonFriends(user, user1)) {
-            commonUserId = id;
+        for (User id : userService.findCommonFriends(user.getId(), user1.getId())) {
+            commonUserId = id.getId();
         }
         Assertions.assertEquals(commonUserId, user2.getId());
     }

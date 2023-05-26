@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,24 +15,21 @@ import java.util.List;
 @RestController
 public class FilmController {
 
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
-
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService filmService) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping(value = "/films")
     public Collection<Film> findAllFilms() {
-       return filmStorage.findAll();
+       return filmService.findAll();
     }
 
     @GetMapping(value = "/films/{id}")
     public Film getFilmById(@PathVariable Long id) {
-        return filmStorage.getFilmById(id);
+        return filmService.getFilmById(id);
     }
 
     @GetMapping(value = "/films/popular")
@@ -43,12 +39,12 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     public Film createFilm(@RequestBody Film film) {
-        return filmStorage.createFilm(film);
+        return filmService.createFilm(film);
     }
 
     @PutMapping(value = "/films")
     public Film updateFilm(@RequestBody Film film) {
-        return filmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")
@@ -58,7 +54,7 @@ public class FilmController {
 
     @DeleteMapping(value = "/films/{id}")
     public void deleteFilm(@PathVariable Long id) {
-        filmStorage.deleteFilmById(id);
+        filmService.deleteFilmById(id);
     }
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")

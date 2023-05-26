@@ -30,7 +30,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         validate(film);
         film.setId(filmId++);
         filmById.put(film.getId(), film);
-        log.info("Film has been crated successful");
+        log.info("Film has been crated successful" + film.getName());
         return film;
     }
 
@@ -41,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             validate(film);
             filmById.put(film.getId(), film);
-            log.info("Film has been updated with id {}", film.getId());
+            log.info(film.getName() + " has been updated");
             return film;
         }
     }
@@ -62,6 +62,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new ValidationException("Cannot find film with this id");
         }
+    }
+
+    public HashMap<Long,Film> getFilmsMap() {
+        return filmById;
     }
 
     private Film validate(Film film) {

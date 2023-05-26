@@ -15,13 +15,13 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     UserStorage userStorage;
     FilmStorage filmStorage;
-    Set<Long> ratedFilmsIds = new HashSet<>();
 
     private static final Logger log = LogManager.getLogger(Film.class);
 
@@ -30,14 +30,32 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
+    public Collection<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    public Film getFilmById(Long id) {
+        return filmStorage.getFilmById(id);
+    }
+
+    public void deleteFilmById(Long id) {
+        filmStorage.deleteFilmById(id);
+    }
+
     public void addLike(Long filmId,Long userId) {
-        for (Film filmIds : filmStorage.findAll()) {
-            ratedFilmsIds.add(filmIds.getId());
-        }
         if (filmStorage.getFilmById(filmId) != null && userStorage.getUserById(userId) != null) {
             if (!(filmStorage.getFilmById(filmId).getVoytedUsers().contains(userId))) {
                 filmStorage.getFilmById(filmId).setScore(filmStorage.getFilmById(filmId).getScore() + 1);
                 filmStorage.getFilmById(filmId).getVoytedUsers().add(userId);
+
                 log.info("Like successfully has been added to film with id {}",
                         filmStorage.getFilmById(filmId).getId());
             } else {
@@ -49,42 +67,32 @@ public class FilmService {
 
     public List<Film> getRateFilmsByCount(int count) {
         List<Film> countedFilms = new ArrayList<>();
-        for (Film filmId : filmStorage.findAll()) {
-            ratedFilmsIds.add(filmId.getId());
-        }
-        if (rateAndSortFilm(ratedFilmsIds).size() >= count) {
+
+        if (filmStorage.getFilmsMap().keySet().size() >= count) {
             for (int i = 0; i < count; i++) {
-                countedFilms.add(rateAndSortFilm(ratedFilmsIds).get(i));
+                countedFilms.add(rateAndSortFilm().get(i));
             }
-        } else if (rateAndSortFilm(ratedFilmsIds).size() < count) {
-            countedFilms.addAll(rateAndSortFilm(ratedFilmsIds));
-            return countedFilms;
+        } else {
+            countedFilms.addAll(rateAndSortFilm());
         }
         return countedFilms;
-    }
-
-    private List<Film> rateAndSortFilm(Set<Long> ratedFilmsIds) {
-        List<Film> ratedFilms = new ArrayList<>();
-        for (Long id : ratedFilmsIds) {
-            ratedFilms.add(filmStorage.getFilmById(id));
-        }
-        ratedFilms.sort(Comparator.comparingInt(Film::getScore)
-                .reversed());
-        return ratedFilms;
     }
 
     public void deleteLike(Long id, Long userId) {
         User user = userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(id);
-        if (user != null && film != null) {
-            if (film.getVoytedUsers().contains(user.getId())) {
-                film.setScore(film.getScore() - 1);
-                film.getVoytedUsers().remove(userId);
-            } else {
-                throw new UserOrFilmNotFoundException("User has not voted for the film");
-            }
+
+        if (film.getVoytedUsers().contains(user.getId())) {
+            film.setScore(film.getScore() - 1);
+            film.getVoytedUsers().remove(userId);
         } else {
-            throw new ValidationException("Film or User is incorrect");
+            throw new UserOrFilmNotFoundException("User has not voted for the film");
         }
+    }
+
+    private List<Film> rateAndSortFilm() {
+        return filmStorage.getFilmsMap().keySet().stream()
+                .map(id -> filmStorage.getFilmById(id)).sorted(Comparator.comparingInt(Film::getScore)
+                        .reversed()).collect(Collectors.toList());
     }
 }
