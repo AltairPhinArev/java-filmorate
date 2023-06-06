@@ -53,13 +53,13 @@ public class FilmService {
     public void addLike(Long filmId,Long userId) {
         if (filmStorage.getFilmById(filmId) != null && userStorage.getUserById(userId) != null) {
             if (!(filmStorage.getFilmById(filmId).getVoytedUsers().contains(userId))) {
-                filmStorage.getFilmById(filmId).setScore(filmStorage.getFilmById(filmId).getScore() + 1);
+                filmStorage.getFilmById(filmId).setLikes(filmStorage.getFilmById(filmId).getLikes() + 1);
                 filmStorage.getFilmById(filmId).getVoytedUsers().add(userId);
 
-                log.info("Like successfully has been added to film with id {}",
+                log.info("Like successfully has been added to Film with id {}",
                         filmStorage.getFilmById(filmId).getId());
             } else {
-                log.error("you can't like film twice");
+                log.error("you can't like Film twice");
                 throw new ValidationException("Film or User Incorrect");
             }
         }
@@ -83,16 +83,16 @@ public class FilmService {
         Film film = filmStorage.getFilmById(id);
 
         if (film.getVoytedUsers().contains(user.getId())) {
-            film.setScore(film.getScore() - 1);
+            film.setLikes(film.getLikes() - 1);
             film.getVoytedUsers().remove(userId);
         } else {
-            throw new UserOrFilmNotFoundException("User has not voted for the film");
+            throw new UserOrFilmNotFoundException("User has not voted for the Film");
         }
     }
 
     private List<Film> rateAndSortFilm() {
         return filmStorage.getFilmsMap().keySet().stream()
-                .map(id -> filmStorage.getFilmById(id)).sorted(Comparator.comparingInt(Film::getScore)
+                .map(id -> filmStorage.getFilmById(id)).sorted(Comparator.comparingInt(Film::getLikes)
                         .reversed()).collect(Collectors.toList());
     }
 }

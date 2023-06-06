@@ -19,10 +19,13 @@ public class Film {
 
     private int duration;
 
-    private int score = 0;
+    private int likes = 0;
+
+    private String genre;
+
+    private String rating_MPA;
 
     private final Set<Long> voytedUsers = new HashSet<>();
-
 
     public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;
@@ -30,5 +33,17 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
     }
+ /*
+    public (Long id, String name, String description, LocalDate releaseDate, int duration, int likes, String genre, String rating_MPA) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.likes = likes;
+        this.genre = genre;
+        this.rating_MPA = rating_MPA;
+    }
 
+  */
 }

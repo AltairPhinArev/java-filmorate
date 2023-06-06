@@ -37,7 +37,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if (!filmById.containsKey(film.getId())) {
-            throw new ValidationException("Cannot find film with this id");
+            throw new ValidationException("Cannot find Film with this id");
         } else {
             validate(film);
             filmById.put(film.getId(), film);
@@ -51,7 +51,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmById.containsKey(id)) {
             return filmById.get(id);
         } else {
-            throw new UserOrFilmNotFoundException("Cannot find film with this id");
+            throw new UserOrFilmNotFoundException("Cannot find Film with this id");
         }
     }
 
@@ -60,11 +60,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmById.containsKey(id)) {
             filmById.remove(id);
         } else {
-            throw new ValidationException("Cannot find film with this id");
+            throw new ValidationException("Cannot find Film with this id");
         }
     }
 
-    public HashMap<Long,Film> getFilmsMap() {
+    public HashMap<Long, Film> getFilmsMap() {
         return filmById;
     }
 
@@ -75,8 +75,8 @@ public class InMemoryFilmStorage implements FilmStorage {
                 film.getDescription().length() < 200 && film.getDuration() > 0) {
             return film;
         } else {
-            log.error("Illegal arguments for film");
-            throw new ValidationException("Illegal arguments for film");
+            log.error("Illegal arguments for Film");
+            throw new ValidationException("Illegal arguments for Film");
         }
     }
 }

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -39,7 +39,7 @@ public class FilmServiceTest {
         userStorage.createUser(user);
 
         filmService.addLike(film.getId(), user.getId());
-        Assertions.assertEquals(1, film.getScore());
+        Assertions.assertEquals(1, film.getLikes());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class FilmServiceTest {
 
         filmService.addLike(film.getId(), user.getId());
         filmService.deleteLike(film.getId(), user.getId());
-        Assertions.assertEquals(0, film.getScore());
+        Assertions.assertEquals(0, film.getLikes());
     }
 
     @Test
