@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
@@ -10,18 +11,15 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
 import java.util.List;
 
-
 @RestController
 public class FilmController {
 
     private final FilmService filmService;
 
-
     @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
-
     @GetMapping(value = "/films")
     public Collection<Film> findAllFilms() {
        return filmService.findAll();

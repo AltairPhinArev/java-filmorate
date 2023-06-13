@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -66,6 +67,21 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
+    @Override
+    public void createFriend(Long userId, Long userFriendId) {
+
+    }
+
+    @Override
+    public List<User> getFriends(Long userId) {
+        return null;
+    }
+
+    @Override
+    public void deleteFromFriends(Long userId, Long userFriendId) {
+
+    }
+
     private User validate(User user) {
         if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
                 !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
@@ -75,7 +91,7 @@ public class InMemoryUserStorage implements UserStorage {
             return user;
         } else {
             log.error("Illegal arguments for user");
-            throw new ValidationException("Illegal arguments for user");
+            throw new UserOrFilmNotFoundException("Illegal arguments for user");
         }
     }
 }

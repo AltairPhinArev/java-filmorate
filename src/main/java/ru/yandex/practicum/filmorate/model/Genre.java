@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class Genre {
 
-    private Long genreId;
-    private String genre;
+    private Byte id;
+    private String name;
 
-    public Genre(Long genreId, String genre) {
-        this.genreId = genreId;
-        this.genre = genre;
+    public Genre(Byte id, String name) {
+        this.id = id;
+        this.name = name;
     }
 }

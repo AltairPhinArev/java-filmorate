@@ -3,31 +3,42 @@ package ru.yandex.practicum.filmorate.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     UserStorage userStorage;
     FilmStorage filmStorage;
+    JdbcTemplate jdbcTemplate;
 
     private static final Logger log = LogManager.getLogger(Film.class);
 
-    public FilmService(UserStorage userStorage, FilmStorage filmStorage) {
+    @Autowired
+    public FilmService(@Qualifier("UserDbStorage") UserStorage userStorage,
+                       @Qualifier("FilmDbStorage") FilmStorage filmStorage,
+                       JdbcTemplate jdbcTemplate) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public Collection<Film> findAll() {
@@ -51,31 +62,39 @@ public class FilmService {
     }
 
     public void addLike(Long filmId,Long userId) {
-        if (filmStorage.getFilmById(filmId) != null && userStorage.getUserById(userId) != null) {
-            if (!(filmStorage.getFilmById(filmId).getVoytedUsers().contains(userId))) {
-                filmStorage.getFilmById(filmId).setLikes(filmStorage.getFilmById(filmId).getLikes() + 1);
-                filmStorage.getFilmById(filmId).getVoytedUsers().add(userId);
+       String sqlQuery = "INSERT IGNORE INTO films_likes (film_id, user_id)" +
+               "VALUES (?, ?)";
 
-                log.info("Like successfully has been added to Film with id {}",
-                        filmStorage.getFilmById(filmId).getId());
-            } else {
-                log.error("you can't like Film twice");
-                throw new ValidationException("Film or User Incorrect");
-            }
-        }
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+            stmt.setLong(1, filmId);
+            stmt.setLong(2, userId);
+            return stmt;
+        }, keyHolder);
+        log.info("you just liked film");
     }
 
     public List<Film> getRateFilmsByCount(int count) {
-        List<Film> countedFilms = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM films ORDER BY likes DESC LIMIT ?";
+        try {
+            return jdbcTemplate.query(sqlQuery, new Object[]{count}, (resultSet, rowNum) -> {
+                Film film = new Film(null,null,null,
+                         null, null);
 
-        if (filmStorage.getFilmsMap().keySet().size() >= count) {
-            for (int i = 0; i < count; i++) {
-                countedFilms.add(rateAndSortFilm().get(i));
-            }
-        } else {
-            countedFilms.addAll(rateAndSortFilm());
+                film.setId(resultSet.getLong("id"));
+                film.setName(resultSet.getString("name"));
+                film.setDescription(resultSet.getString("description"));
+                film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
+                film.setDuration(resultSet.getInt("duration"));
+                film.setMpa((MPA)resultSet.getObject("rating_id"));
+                return film;
+            });
+        } catch (UserOrFilmNotFoundException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
-        return countedFilms;
     }
 
     public void deleteLike(Long id, Long userId) {
@@ -88,11 +107,5 @@ public class FilmService {
         } else {
             throw new UserOrFilmNotFoundException("User has not voted for the Film");
         }
-    }
-
-    private List<Film> rateAndSortFilm() {
-        return filmStorage.getFilmsMap().keySet().stream()
-                .map(id -> filmStorage.getFilmById(id)).sorted(Comparator.comparingInt(Film::getLikes)
-                        .reversed()).collect(Collectors.toList());
     }
 }

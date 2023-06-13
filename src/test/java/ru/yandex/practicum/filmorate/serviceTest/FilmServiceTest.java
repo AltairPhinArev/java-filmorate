@@ -24,7 +24,7 @@ public class FilmServiceTest {
     public void setUp() {
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
-        filmService = new FilmService(userStorage, filmStorage);
+        //filmService = new FilmService(userStorage, filmStorage);
     }
 
     @Test

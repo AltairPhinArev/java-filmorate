@@ -15,7 +15,7 @@ public interface FilmStorage {
 
     Film getFilmById(Long id);
 
-    HashMap<Long, Film> getFilmsMap();
+    //HashMap<Long, Film> getFilmsMap();
 
     void deleteFilmById(Long id);
 
