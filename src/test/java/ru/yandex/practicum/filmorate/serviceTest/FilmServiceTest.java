@@ -39,7 +39,7 @@ public class FilmServiceTest {
         userStorage.createUser(user);
 
         filmService.addLike(film.getId(), user.getId());
-        Assertions.assertEquals(1, film.getLikes());
+        Assertions.assertEquals(1, film.getRate());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class FilmServiceTest {
 
         filmService.addLike(film.getId(), user.getId());
         filmService.deleteLike(film.getId(), user.getId());
-        Assertions.assertEquals(0, film.getLikes());
+        Assertions.assertEquals(0, film.getRate());
     }
 
     @Test

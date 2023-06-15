@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -20,14 +21,15 @@ public class Film {
 
     private Integer duration;
 
-    private Integer likes = 0;
+    private Integer rate = 0;
 
-    private Set<Genre> genre = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 
     private MPA mpa;
 
     private final Set<Long> voytedUsers = new HashSet<>();
-
+    /*
+    @Autowired
     public Film(String name, String description, LocalDate releaseDate, Integer duration, MPA mpa) {
         this.name = name;
         this.description = description;
@@ -35,5 +37,19 @@ public class Film {
         this.duration = duration;
         this.mpa = mpa;
     }
+
+     */
+
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPA mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+
+        this.mpa = mpa;
+    }
+
 
 }

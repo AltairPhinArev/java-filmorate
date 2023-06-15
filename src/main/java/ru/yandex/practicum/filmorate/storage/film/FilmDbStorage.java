@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -12,6 +14,7 @@ import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
@@ -43,12 +46,15 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> findAll() {
         String sql = "SELECT * FROM films";
         return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film (
+                rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
                 new MPA(rs.getInt("rating_id"))
-        )));
+
+        )
+        ));
     }
 
     @Override
@@ -69,7 +75,9 @@ public class FilmDbStorage implements FilmStorage {
             stmt.setInt(4, film.getDuration());
             film.setMpa(mpaService.getMpaRateById(mpaService.getMpaRateById(film.getMpa().getId()).getId()));
             stmt.setInt(5, film.getMpa().getId());
-            genreService.addGenreToFilm(film);
+            film.setRate(0);
+
+
             return stmt;
 
         }, keyHolder);
@@ -77,6 +85,9 @@ public class FilmDbStorage implements FilmStorage {
         Number generatedId = keyHolder.getKey();
         if (generatedId != null) {
             film.setId(generatedId.longValue());
+        }
+        for (Genre genre : film.getGenres()) {
+            genreService.addGenreToFilm(film);
         }
         log.info("film has been created");
         return film;
@@ -86,7 +97,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         validate(film);
 
-        if (getFilmById(film.getId()) != null) {
+        if (film.getId() != null) {
             String sqlQuery = "UPDATE films SET " +
                     "name = ?, description = ?, release_date = ?, duration = ?, " +
                     "rating_id = ? WHERE id = ?";
@@ -97,13 +108,14 @@ public class FilmDbStorage implements FilmStorage {
                 stmt.setString(2, film.getDescription());
                 stmt.setString(3, film.getReleaseDate().toString());
                 stmt.setString(4, film.getDuration().toString());
-                stmt.setString(5, film.getMpa().toString());
+                stmt.setInt(5, film.getRate());
+                stmt.setInt(6,film.getMpa().getId());
 
                 return stmt;
             });
 
         } else {
-            throw new ValidationException("Film by name" + film.getName() + "doesn't exist");
+            throw new UserOrFilmNotFoundException("Film by name" + film.getName() + "doesn't exist");
         }
         return film;
     }
@@ -113,19 +125,18 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "SELECT * FROM films WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
-                Film film = new Film(null, null,null,null,null);
+                Film film = new Film(null, null,null,null,null ,null);
 
                 film.setId(resultSet.getLong("id"));
                 film.setName(resultSet.getString("name"));
                 film.setDescription(resultSet.getString("description"));
                 film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
                 film.setDuration(resultSet.getInt("duration"));
-                film.setMpa((MPA) resultSet.getObject("rating_id"));
+                film.setMpa(mpaService.getMpaRateById(resultSet.getInt("rating_id")));
                 return film;
             });
-        } catch (UserOrFilmNotFoundException e) {
-            e.printStackTrace();
-            return null;
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserOrFilmNotFoundException(e.getMessage());
         }
     }
 

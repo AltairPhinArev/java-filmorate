@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -33,6 +35,7 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> findAll() {
         String sqlQuery = "SELECT * FROM users";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> new User(
+                rs.getLong("id"),
                 rs.getString("email"),
                 rs.getString("login"),
                 rs.getString("name"),
@@ -71,12 +74,43 @@ public class UserDbStorage implements UserStorage {
     public User updateUser(User user) {
         validate(user);
 
-        return null;
+        if (user.getId() != null) {
+            String sqlQuery = "UPDATE users SET " +
+                    "email = ?, login = ?, name = ?, birthday = ?";
+
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(sqlQuery);
+                stmt.setString(1, user.getEmail());
+                stmt.setString(2, user.getLogin());
+                stmt.setString(3, user.getName());
+                stmt.setDate(4, Date.valueOf(user.getBirthday()));
+                return stmt;
+            });
+
+        } else {
+            throw new UserOrFilmNotFoundException("Film by name" + user.getName() + "doesn't exist");
+        }
+        return user;
     }
 
     @Override
     public User getUserById(Long id) {
-        return null;
+        String sqlQuery = "SELECT * FROM users WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
+
+                User user = new User(null, null,null,null,null);
+
+                user.setId(resultSet.getLong("id"));
+                user.setEmail(resultSet.getString("email"));
+                user.setLogin(resultSet.getString("login"));
+                user.setName(resultSet.getString("name"));
+                user.setBirthday(resultSet.getDate("birthday").toLocalDate());
+                return user;
+            });
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserOrFilmNotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -123,6 +157,7 @@ public class UserDbStorage implements UserStorage {
             String sql = "SELECT friend_id, email, login, name, birthday FROM friends" +
                     " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?";
             return jdbcTemplate.query(sql, (rs, rowNum) -> new User(
+                            rs.getLong("id"),
                             rs.getString("email"),
                             rs.getString("login"),
                             rs.getString("name"),

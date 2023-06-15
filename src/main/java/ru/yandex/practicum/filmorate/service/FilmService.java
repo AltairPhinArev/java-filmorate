@@ -27,6 +27,7 @@ import java.util.*;
 public class FilmService {
 
     UserStorage userStorage;
+    MpaService mpaService;
     FilmStorage filmStorage;
     JdbcTemplate jdbcTemplate;
 
@@ -35,9 +36,10 @@ public class FilmService {
     @Autowired
     public FilmService(@Qualifier("UserDbStorage") UserStorage userStorage,
                        @Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                       JdbcTemplate jdbcTemplate) {
+                       MpaService mpaService, JdbcTemplate jdbcTemplate) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
+        this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -77,18 +79,18 @@ public class FilmService {
     }
 
     public List<Film> getRateFilmsByCount(int count) {
-        String sqlQuery = "SELECT * FROM films ORDER BY likes DESC LIMIT ?";
+        String sqlQuery = "SELECT * FROM films DESC LIMIT ?";
         try {
             return jdbcTemplate.query(sqlQuery, new Object[]{count}, (resultSet, rowNum) -> {
                 Film film = new Film(null,null,null,
-                         null, null);
+                          null,null, null);
 
                 film.setId(resultSet.getLong("id"));
                 film.setName(resultSet.getString("name"));
                 film.setDescription(resultSet.getString("description"));
                 film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
                 film.setDuration(resultSet.getInt("duration"));
-                film.setMpa((MPA)resultSet.getObject("rating_id"));
+                film.setMpa(mpaService.getMpaRateById(resultSet.getInt("rating_id")));
                 return film;
             });
         } catch (UserOrFilmNotFoundException e) {
@@ -102,7 +104,7 @@ public class FilmService {
         Film film = filmStorage.getFilmById(id);
 
         if (film.getVoytedUsers().contains(user.getId())) {
-            film.setLikes(film.getLikes() - 1);
+            film.setRate(film.getRate() - 1);
             film.getVoytedUsers().remove(userId);
         } else {
             throw new UserOrFilmNotFoundException("User has not voted for the Film");

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class GenreStorage {
         );
     }
 
-    public Genre getGenreById (Long genreId) {
+    public Genre getGenreById (Byte genreId) {
         if (genreId == null) {
             throw new ValidationException("id was not selected");
         }
@@ -48,10 +49,10 @@ public class GenreStorage {
     public void addGenreToFilm(Film film) {
         String sql = "SELECT genre_id, name FROM film_genres" +
                 "INNER JOIN genres ON genre_id = id WHERE film_id = ?";
-        if (film.getGenre() != null) {
-            for (Genre genre : film.getGenre()) {
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)",
-                        film.getId(), genre.getId());
+                         genre.getId(), film.getId());
             }
         }
     }

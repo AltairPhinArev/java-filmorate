@@ -24,7 +24,7 @@ public class GenreService {
         return genreStorage.getAllGenre().stream().sorted(Comparator.comparing(Genre::getId)).collect(Collectors.toList());
     }
 
-    public Genre getGenreById(Long id) {
+    public Genre getGenreById(Byte id) {
         return genreStorage.getGenreById(id);
     }
 
