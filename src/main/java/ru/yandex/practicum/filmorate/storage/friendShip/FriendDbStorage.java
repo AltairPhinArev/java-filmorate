@@ -57,7 +57,7 @@ public class FriendDbStorage {
         String sql = "SELECT users.id, users.name, users.email, users.login, users.birthday ,FROM friends " +
                 " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            User friendUser = new User(rs.getLong("id") ,rs.getString("email"),
+            User friendUser = new User(rs.getLong("id"),rs.getString("email"),
                     rs.getString("login"),rs.getString("name"),
                     rs.getDate("birthday").toLocalDate());
             return friendUser;
