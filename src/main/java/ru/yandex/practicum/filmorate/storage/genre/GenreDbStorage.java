@@ -22,7 +22,7 @@ public class GenreDbStorage {
     }
 
 
-    public List<Genre> getAllGenre () {
+    public List<Genre> getAllGenre() {
         String sql = "SELECT * FROM genres";
         return jdbcTemplate.query(sql, (rs, rowNum) -> new Genre(
                 rs.getInt("id"),
@@ -30,7 +30,7 @@ public class GenreDbStorage {
         );
     }
 
-    public Genre getGenreById (Integer genreId) {
+    public Genre getGenreById(Integer genreId) {
 
         if (genreId == null) {
             throw new ValidationException("Illegal Arguments!");
@@ -53,7 +53,7 @@ public class GenreDbStorage {
         }
     }
 
-    public void deleteGenreFromFilm (Film film) {
+    public void deleteGenreFromFilm(Film film) {
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
     }
 

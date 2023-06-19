@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.ratingMPA;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.MPA;
 
@@ -12,7 +13,6 @@ import java.util.List;
 public class MpaDbStorage {
 
     JdbcTemplate jdbcTemplate;
-
 
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
