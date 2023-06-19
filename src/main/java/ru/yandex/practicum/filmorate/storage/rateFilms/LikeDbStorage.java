@@ -44,7 +44,7 @@ public class LikeDbStorage {
                 "FROM films LEFT JOIN film_likes ON films.id = film_likes.film_id " +
                 "GROUP BY films.id ORDER BY COUNT(film_likes.user_id) DESC LIMIT ?";
 
-        log.info("Top films by count{}" , count);
+        log.info("Top films by count{}", count);
         return jdbcTemplate.query(getPopularQuery, (rs, rowNum) -> new Film(
                         rs.getLong("id"),
                         rs.getString("name"),

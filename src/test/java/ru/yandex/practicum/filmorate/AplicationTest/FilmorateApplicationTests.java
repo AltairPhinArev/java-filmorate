@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.AplicationTest;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
@@ -24,7 +24,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import java.time.LocalDate;
 import java.util.*;
 
-
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest
@@ -44,7 +43,7 @@ class FilmorateApplicationTests {
 				.id(0L)
 				.name("ANtonY")
 				.login("technojew")
-				.birthday(LocalDate.now().minusDays(8824))
+				.birthday(LocalDate.of(1975, 11, 19))
 				.email("fositik@yandex.ru").build();
 
 		Assertions.assertEquals(user,  userStorage.createUser(user));
