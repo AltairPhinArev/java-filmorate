@@ -1,11 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jdk.jshell.Snippet;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
