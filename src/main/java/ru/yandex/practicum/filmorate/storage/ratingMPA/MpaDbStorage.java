@@ -4,19 +4,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
 
 @Component
-public class MpaStorage {
+public class MpaDbStorage {
 
     JdbcTemplate jdbcTemplate;
 
 
-    public MpaStorage(JdbcTemplate jdbcTemplate) {
+    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

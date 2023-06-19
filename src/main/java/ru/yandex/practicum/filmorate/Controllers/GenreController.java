@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.ratingMPA.MpaStorage;
 
 import java.util.List;
 
@@ -27,7 +25,7 @@ public class GenreController {
     }
 
     @GetMapping(value = "/genres/{id}")
-    public Genre getGenreById(@PathVariable Byte id) {
+    public Genre getGenreById(@PathVariable Integer id) {
         return genreService.getGenreById(id);
     }
 

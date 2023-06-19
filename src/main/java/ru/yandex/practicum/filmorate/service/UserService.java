@@ -4,23 +4,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     UserStorage userStorage;
+    FriendDbStorage friendDbStorage;
 
-    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage) {
+    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage, FriendDbStorage friendDbStorage) {
         this.userStorage = userStorage;
+        this.friendDbStorage = friendDbStorage;
     }
 
     private static final Logger log = LogManager.getLogger(User.class);
@@ -46,18 +45,28 @@ public class UserService {
     }
 
     public void createFriend(Long userId, Long userFriendId) {
-        userStorage.createFriend(userId, userFriendId);
+        friendDbStorage.createFriend(userId, userFriendId);
     }
 
     public List<User> findAllFriend(Long user) {
-        return userStorage.getFriends(user);
+        return friendDbStorage.getFriends(user);
     }
-/*
-    public List<User> findCommonFriends(Long user, Long friendUser) {
 
+    public List<User> findCommonFriends(Long firstUserId, Long secondUserId) {
+
+        User user = getUserById(firstUserId);
+        User commonUser = getUserById(secondUserId);
+
+        Set<User> commonFriends = new HashSet<>();
+
+        if ((user != null) && (commonUser != null)) {
+            commonFriends = new HashSet<>(friendDbStorage.getFriends(firstUserId));
+            commonFriends.retainAll(friendDbStorage.getFriends(secondUserId));
+        }
+        return new ArrayList<User>(commonFriends);
     }
- */
+
     public void deleteFromFriends(Long user, Long otherUser) {
-        userStorage.deleteFromFriends(user, otherUser);
+        friendDbStorage.deleteFromFriends(user, otherUser);
     }
 }

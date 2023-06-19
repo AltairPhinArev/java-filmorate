@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-
 import java.util.Set;
 
 @Data
@@ -23,33 +21,22 @@ public class Film {
 
     private Integer rate = 0;
 
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres;
 
     private MPA mpa;
 
-    private final Set<Long> voytedUsers = new HashSet<>();
-    /*
-    @Autowired
-    public Film(String name, String description, LocalDate releaseDate, Integer duration, MPA mpa) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-    }
+    private Set<Long> voytedUsers;
 
-     */
-
-
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPA mpa) {
+    @Builder
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
+                Set<Long> voytedUsers, Set<Genre> genres, MPA mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-
+        this.voytedUsers = voytedUsers;
+        this.genres = genres;
         this.mpa = mpa;
     }
-
-
 }
