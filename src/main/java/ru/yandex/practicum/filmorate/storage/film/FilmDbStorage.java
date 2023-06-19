@@ -49,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film (
+        return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("description"),
@@ -100,9 +100,7 @@ public class FilmDbStorage implements FilmStorage {
 
 
     public Film updateFilm(Film film) {
-        if (film == null) {
-            throw new ValidationException("Illegal arguments");
-        }
+        validate(film);
 
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, " + "rating_id = ? WHERE id = ?";
