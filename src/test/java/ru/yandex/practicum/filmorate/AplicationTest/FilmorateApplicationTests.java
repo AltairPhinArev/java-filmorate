@@ -109,6 +109,7 @@ class FilmorateApplicationTests {
 
 		Assertions.assertEquals(2, filmService.findAll().size());
 	}
+
 	@Test
 	public void testRemoveFilmById() {
 		Film film1 = Film.builder()
