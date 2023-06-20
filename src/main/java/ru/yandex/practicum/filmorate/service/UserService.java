@@ -3,22 +3,25 @@ package ru.yandex.practicum.filmorate.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     UserStorage userStorage;
+    FriendDbStorage friendDbStorage;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage, FriendDbStorage friendDbStorage) {
         this.userStorage = userStorage;
+        this.friendDbStorage = friendDbStorage;
     }
 
     private static final Logger log = LogManager.getLogger(User.class);
@@ -28,10 +31,12 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        validate(user);
        return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
+        validate(user);
         return userStorage.updateUser(user);
     }
 
@@ -44,45 +49,41 @@ public class UserService {
     }
 
     public void createFriend(Long userId, Long userFriendId) {
-        User user = userStorage.getUserById(userId);
-        User userFriend = userStorage.getUserById(userFriendId);
-        if ((user != null && userFriend != null && !Objects.equals(user.getId(), userFriend.getId()))) {
-            user.getFriends().add(userFriend.getId());
-            userFriend.getFriends().add(user.getId());
-            log.info("FriendShip has been created");
-        } else {
-            throw new ValidationException("Cannot find User");
-        }
+        friendDbStorage.createFriend(userId, userFriendId);
     }
 
     public List<User> findAllFriend(Long user) {
-        return userStorage.getUserById(user).getFriends().stream()
-                .map(friendId -> userStorage.getUserById(friendId))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return friendDbStorage.getFriends(user);
     }
 
-    public List<User> findCommonFriends(Long user, Long friendUser) {
+    public List<User> findCommonFriends(Long firstUserId, Long secondUserId) {
 
-        Set<Long> commonFriendsIds = userStorage.getUserById(user).getFriends().stream()
-                .filter(friendId -> userStorage.getUserById(friendUser).getFriends().contains(friendId))
-                .collect(Collectors.toSet());
+        User user = getUserById(firstUserId);
+        User commonUser = getUserById(secondUserId);
 
-        if (commonFriendsIds.size() == 0) {
-            log.info("You don't have common friends");
+        Set<User> commonFriends = new HashSet<>();
+
+        if ((user != null) && (commonUser != null)) {
+            commonFriends = new HashSet<>(friendDbStorage.getFriends(firstUserId));
+            commonFriends.retainAll(friendDbStorage.getFriends(secondUserId));
         }
-
-        return commonFriendsIds.stream()
-                .map(commonId -> userStorage.getUserById(commonId))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return new ArrayList<User>(commonFriends);
     }
 
     public void deleteFromFriends(Long user, Long otherUser) {
-        if (userStorage.getUserById(user).getFriends().size() == 0
-                || userStorage.getUserById(otherUser).getFriends().size() == 0) {
-            throw new ValidationException(HttpStatus.BAD_REQUEST.toString());
+        friendDbStorage.deleteFromFriends(user, otherUser);
+    }
+
+    private User validate(User user) {
+        if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
+                !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
+            if (user.getName() == null || user.getName().isBlank()) {
+                user.setName(user.getLogin());
+            }
+            return user;
         } else {
-            userStorage.getUserById(user).getFriends().remove(otherUser);
-            userStorage.getUserById(otherUser).getFriends().remove(user);
+            log.error("Illegal arguments for user");
+            throw new ValidationException("Illegal arguments for user");
         }
     }
 }

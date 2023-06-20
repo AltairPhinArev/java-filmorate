@@ -4,11 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -27,7 +26,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        validate(film);
         film.setId(filmId++);
         filmById.put(film.getId(), film);
         log.info("Film has been crated successful" + film.getName());
@@ -37,9 +35,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if (!filmById.containsKey(film.getId())) {
-            throw new ValidationException("Cannot find film with this id");
+            throw new ValidationException("Cannot find Film with this id");
         } else {
-            validate(film);
             filmById.put(film.getId(), film);
             log.info(film.getName() + " has been updated");
             return film;
@@ -51,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmById.containsKey(id)) {
             return filmById.get(id);
         } else {
-            throw new UserOrFilmNotFoundException("Cannot find film with this id");
+            throw new NotFoundException("Cannot find Film with this id");
         }
     }
 
@@ -60,23 +57,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmById.containsKey(id)) {
             filmById.remove(id);
         } else {
-            throw new ValidationException("Cannot find film with this id");
-        }
-    }
-
-    public HashMap<Long,Film> getFilmsMap() {
-        return filmById;
-    }
-
-    private Film validate(Film film) {
-        if (film.getName() != null &&
-                !film.getName().isEmpty() &&
-                film.getReleaseDate().isAfter(LocalDate.of(1895, 1, 28)) &&
-                film.getDescription().length() < 200 && film.getDuration() > 0) {
-            return film;
-        } else {
-            log.error("Illegal arguments for film");
-            throw new ValidationException("Illegal arguments for film");
+            throw new ValidationException("Cannot find Film with this id");
         }
     }
 }

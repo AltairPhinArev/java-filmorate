@@ -6,11 +6,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -29,7 +28,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(@RequestBody User user) {
-        validate(user);
         user.setId(userId++);
         userById.put(user.getId(), user);
         log.info(user.getName() + ", has been created successful with id {}", user.getId());
@@ -41,7 +39,6 @@ public class InMemoryUserStorage implements UserStorage {
         if (!userById.containsKey(user.getId())) {
             throw new ValidationException("Can't find User");
         } else {
-            validate(user);
             userById.put(user.getId(), user);
             log.info(user.getName() + " has been updated with id {}", user.getId());
             return user;
@@ -62,20 +59,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (userById.containsKey(id)) {
             return userById.get(id);
         } else {
-            throw new UserOrFilmNotFoundException("Can't find User");
-        }
-    }
-
-    private User validate(User user) {
-        if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
-                !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            return user;
-        } else {
-            log.error("Illegal arguments for user");
-            throw new ValidationException("Illegal arguments for user");
+            throw new NotFoundException("Can't find User");
         }
     }
 }
