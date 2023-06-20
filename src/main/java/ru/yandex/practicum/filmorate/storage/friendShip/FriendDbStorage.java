@@ -25,15 +25,15 @@ public class FriendDbStorage {
         User user  = userService.getUserById(userId);
         User friendUser = userService.getUserById(friendId);
 
-        if (friendUser.getFriends().contains(user) && user.getFriends().contains(friendUser)) {
+        if (friendUser.getFriends().contains(user)) {
             friendStatus = true;
 
             String sql = "UPDATE friends SET user_id = ? AND friend_id = ? AND status = ? " +
                     "WHERE user_id = ? AND friend_id = ?";
             jdbcTemplate.update(sql, friendId, userId, true, friendId, userId);
         }
-
         String sql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
+        user.getFriends().add(friendUser);
         jdbcTemplate.update(sql, userId, friendId, friendStatus);
     }
 
