@@ -25,7 +25,7 @@ public class FriendDbStorage {
         User user  = userService.getUserById(userId);
         User friendUser = userService.getUserById(friendId);
 
-        if (friendUser.getFriends().contains(user)) {
+        if (friendUser.getFriends().contains(user) && user.getFriends().contains(friendUser)) {
             friendStatus = true;
 
             String sql = "UPDATE friends SET user_id = ? AND friend_id = ? AND status = ? " +
