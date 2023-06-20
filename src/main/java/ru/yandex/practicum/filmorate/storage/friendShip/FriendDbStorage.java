@@ -25,8 +25,7 @@ public class FriendDbStorage {
         User user  = userService.getUserById(userId);
         User friendUser = userService.getUserById(friendId);
 
-        if (friendUser.getFriends().contains(userId) && user.getFriends().contains(friendUser)) {
-
+        if (friendUser.getFriends().contains(user)) {
             friendStatus = true;
 
             String sql = "UPDATE friends SET user_id = ? AND friend_id = ? AND status = ? " +
@@ -37,7 +36,6 @@ public class FriendDbStorage {
         String sql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, userId, friendId, friendStatus);
     }
-
 
     public void deleteFromFriends(Long userId, Long userFriendId) {
         if ((userService.getUserById(userFriendId) != null) && (userService.getUserById(userFriendId) != null)) {

@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -23,7 +23,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,8 +67,6 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "INSERT INTO films(name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
-        validate(film);
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -80,8 +77,8 @@ public class FilmDbStorage implements FilmStorage {
             stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
             stmt.setInt(4, film.getDuration());
             stmt.setInt(5, film.getMpa().getId());
-            film.setVoytedUsers(film.getVoytedUsers());
-            film.setMpa(mpaService.getMpaRateById(mpaService.getMpaRateById(film.getMpa().getId()).getId()));
+
+            film.setMpa(mpaService.getMpaRateById(film.getMpa().getId()));
             return stmt;
 
         }, keyHolder);
@@ -100,8 +97,6 @@ public class FilmDbStorage implements FilmStorage {
 
 
     public Film updateFilm(Film film) {
-        validate(film);
-
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, " + "rating_id = ? WHERE id = ?";
 
@@ -127,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
             log.info("film has been updated");
             return film;
         } else {
-            throw new UserOrFilmNotFoundException("Film with id ==>" + film.getId() + "<== not founded");
+            throw new NotFoundException("Film with id ==>" + film.getId() + "<== not founded");
         }
     }
 
@@ -151,7 +146,7 @@ public class FilmDbStorage implements FilmStorage {
                     new HashSet<>(genreService.getGenresByFilmId(filmId)),
                     mpaService.getMpaRateById(filmRows.getInt("rating_id")));
         } else {
-            throw new UserOrFilmNotFoundException("Film Not founded by id" + filmId);
+            throw new NotFoundException("Film Not founded by id" + filmId);
         }
         return film;
     }
@@ -159,24 +154,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteFilmById(Long filmId) {
         String sqlQuery = "DELETE FROM films WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sqlQuery, filmId);
 
-        if (jdbcTemplate.update(sqlQuery, filmId) == 0) {
-            throw new UserOrFilmNotFoundException("Film with id" + filmId + "not founded");
+        if (rowsAffected == 0) {
+            throw new NotFoundException("Film with id " + filmId + " not found");
         } else {
-            jdbcTemplate.update(sqlQuery, filmId);
-            log.info("film with id ==>" + filmId + "<== has been deleted");
-        }
-    }
-
-    private Film validate(Film film) {
-        if (film.getName() != null &&
-                !film.getName().isEmpty() &&
-                film.getReleaseDate().isAfter(LocalDate.of(1895, 1, 28)) &&
-                film.getDescription().length() < 200 && film.getDuration() > 0) {
-            return film;
-        } else {
-            log.error("Illegal arguments for Film");
-            throw new ValidationException("Illegal arguments for Film");
+            log.info("Film with id " + filmId + " has been deleted");
         }
     }
 }

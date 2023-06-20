@@ -4,7 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class MpaDbStorage {
 
     public MPA getMPAById(Integer id) {
         if (id == null) {
-            throw new UserOrFilmNotFoundException("id was not selected, or id was too long");
+            throw new ValidationException("id was not selected, or id was too long");
         }
 
         MPA mpa;
@@ -36,7 +37,7 @@ public class MpaDbStorage {
         if (sqlRowSet.first()) {
             mpa = new MPA(sqlRowSet.getInt("id"), sqlRowSet.getString("name"));
         } else {
-            throw new UserOrFilmNotFoundException(id + "not founded");
+            throw new NotFoundException(id + "not founded");
         }
         return mpa;
     }

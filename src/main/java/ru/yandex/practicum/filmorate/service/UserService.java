@@ -5,10 +5,12 @@ import org.apache.logging.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -29,10 +31,12 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        validate(user);
        return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
+        validate(user);
         return userStorage.updateUser(user);
     }
 
@@ -68,5 +72,18 @@ public class UserService {
 
     public void deleteFromFriends(Long user, Long otherUser) {
         friendDbStorage.deleteFromFriends(user, otherUser);
+    }
+
+    private User validate(User user) {
+        if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
+                !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
+            if (user.getName() == null || user.getName().isBlank()) {
+                user.setName(user.getLogin());
+            }
+            return user;
+        } else {
+            log.error("Illegal arguments for user");
+            throw new ValidationException("Illegal arguments for user");
+        }
     }
 }

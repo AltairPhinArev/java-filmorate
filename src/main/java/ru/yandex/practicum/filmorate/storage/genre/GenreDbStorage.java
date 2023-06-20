@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -41,7 +41,7 @@ public class GenreDbStorage {
         if (sqlRowSet.first()) {
             genre = new Genre(sqlRowSet.getInt("id"), sqlRowSet.getString("name"));
         } else {
-            throw new UserOrFilmNotFoundException(genreId + " Not founded");
+            throw new NotFoundException(genreId + " Not founded");
         }
         return genre;
     }

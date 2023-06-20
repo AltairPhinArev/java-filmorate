@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -61,9 +61,9 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
-    @ExceptionHandler(UserOrFilmNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpStatus handleNegativeCount(final UserOrFilmNotFoundException e) {
+    public HttpStatus handleNegativeCount(final NotFoundException e) {
         return HttpStatus.NOT_FOUND;
     }
 }

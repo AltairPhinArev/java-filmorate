@@ -1,33 +1,34 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
 public class FilmService {
 
-    UserStorage userStorage;
-    MpaService mpaService;
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
     JdbcTemplate jdbcTemplate;
 
+    private static final Logger log = LogManager.getLogger(Film.class);
+
     @Autowired
-    public FilmService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                       @Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                       MpaService mpaService,LikeDbStorage likeDbStorage, JdbcTemplate jdbcTemplate) {
-        this.userStorage = userStorage;
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
+                       JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
-        this.mpaService = mpaService;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -37,10 +38,12 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
+        validate(film);
         return filmStorage.createFilm(film);
     }
 
     public Film updateFilm(Film film) {
+        validate(film);
         return filmStorage.updateFilm(film);
     }
 
@@ -66,5 +69,17 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
+    }
+
+    private Film validate(Film film) {
+        if (film.getName() != null &&
+                !film.getName().isEmpty() &&
+                film.getReleaseDate().isAfter(LocalDate.of(1895, 1, 28)) &&
+                film.getDescription().length() < 200 && film.getDuration() > 0) {
+            return film;
+        } else {
+            log.error("Illegal arguments for Film");
+            throw new ValidationException("Illegal arguments for Film");
+        }
     }
 }

@@ -8,15 +8,13 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.Collection;
 
 @Component("UserDbStorage")
@@ -47,8 +45,6 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "INSERT INTO users(email, login, name, birthday)" +
                 "VALUES (?, ?, ?, ?)";
 
-        validate(user);
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -65,13 +61,12 @@ public class UserDbStorage implements UserStorage {
         if (userId != null) {
             user.setId(userId.longValue());
         }
-
+        log.info("User has been created with ID={}", user.getId());
         return user;
     }
 
     @Override
     public User updateUser(User user) {
-        validate(user);
 
         if (getUserById(user.getId()) != null) {
 
@@ -88,7 +83,7 @@ public class UserDbStorage implements UserStorage {
             log.info("User updated {}", user.getId());
             return user;
         } else {
-            throw new UserOrFilmNotFoundException("User with ID=" + user.getId() + "NOT FOUND");
+            throw new NotFoundException("User with ID=" + user.getId() + "NOT FOUND");
         }
     }
 
@@ -108,7 +103,7 @@ public class UserDbStorage implements UserStorage {
             });
         } catch (EmptyResultDataAccessException e) {
             log.error("NOT FOUNDED USER");
-            throw new UserOrFilmNotFoundException(e.getMessage());
+            throw new NotFoundException(e.getMessage());
         }
     }
 
@@ -117,21 +112,9 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "DELETE FROM users";
         if (getUserById(id) != null) {
          jdbcTemplate.update(sqlQuery, id);
+         log.info("User has been deleted with ID={}", id);
         } else {
-            throw new UserOrFilmNotFoundException("NOT FOUND");
-        }
-    }
-
-    private User validate(User user) {
-        if (user.getEmail() != null && user.getBirthday().isBefore(LocalDate.now()) && user.getLogin() != null &&
-                !user.getLogin().contains(" ") && user.getEmail().contains("@")) {
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            return user;
-        } else {
-            log.error("Illegal arguments for user");
-            throw new ValidationException("Illegal arguments for user");
+            throw new NotFoundException("NOT FOUND");
         }
     }
 }

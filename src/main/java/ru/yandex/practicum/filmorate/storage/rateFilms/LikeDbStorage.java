@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.Exceptions.UserOrFilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.GenreService;
@@ -74,7 +74,7 @@ public class LikeDbStorage {
               String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
               jdbcTemplate.update(sql, filmId, userId);
           } else {
-              throw new UserOrFilmNotFoundException(HttpStatus.NOT_FOUND.toString());
+              throw new NotFoundException(HttpStatus.NOT_FOUND.toString());
           }
         } catch (NullPointerException e) {
           e.getMessage();
