@@ -1,4 +1,5 @@
 # Filmorate
+-
 Template repository for Filmorate project.
 
 The backend of a social network that will help you choose a movie based on what movies you and your friends
@@ -7,7 +8,12 @@ are watching and what ratings you give them
 Technologies used:
 -
 
-- Java 11, GSON, Http Server, JUnit Test Framework, SpringFrameWork, PostgresSQL, H2 server
+- Java 11
+- SpringBootFrameWork
+- SpringBoot Test Framework, 
+- PostgresSQL
+- RestAPI
+- H2 server
 
 Application functionality:
 - 
