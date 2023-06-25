@@ -23,6 +23,6 @@ Application functionality:
 - adding users as friends
 - removing users from friends
 
-Diogram of Applicaticon and  Dependencies
+Diogram of Application and  Dependencies
 -
 ![image](https://github.com/AltairPhinArev/java-filmorate/assets/113471380/a1ee1f7a-4467-4778-ae5f-45acc5498cb7)
