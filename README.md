@@ -1,7 +1,6 @@
 # Filmorate
-Template repository for Filmorate project.
 
-The backend of a social network that will help you choose a movie based on what movies you and your friends
+The backend-Application of a social network that will help you choose a movie based on what movies you and your friends
 are watching and what ratings you give them
 
 Technologies used:
