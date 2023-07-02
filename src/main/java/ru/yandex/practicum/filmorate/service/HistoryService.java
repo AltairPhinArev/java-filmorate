@@ -13,8 +13,6 @@ public class HistoryService {
 
     UserFeedDbStorage userFeedDbStorage;
 
-    HistoryService historyService;
-
     @Autowired
     public HistoryService(UserFeedDbStorage userFeedDbStorage) {
         this.userFeedDbStorage = userFeedDbStorage;
