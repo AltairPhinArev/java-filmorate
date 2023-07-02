@@ -59,6 +59,33 @@ public class LikeDbStorage {
 
     }
 
+    public List<Film> findCommonFilms(Long userId, Long friendId) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.rating_id " +
+                "FROM films f " +
+                "JOIN film_likes fl1 ON fl1.film_id = f.id AND fl1.user_id = ? " +
+                "JOIN film_likes fl2 ON fl2.film_id = f.id AND fl2.user_id = ? " +
+                "JOIN (SELECT film_id, COUNT(user_id) AS rate FROM film_likes GROUP BY film_id) " +
+                "AS fl ON fl.film_id = f.id " +
+                "ORDER BY fl.rate DESC";
+
+        return jdbcTemplate.query(
+                sqlQuery,
+                new Object[]{userId, friendId},
+                (rs, rowNum) -> {
+                    Film film = new Film(
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getDate("release_date").toLocalDate(),
+                            rs.getInt("duration"),
+                            new HashSet<>(getLikes(rs.getLong("id"))),
+                            new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
+                            new MPA(rs.getInt("rating_id"),
+                                    mpaService.getMpaRateById(rs.getInt("rating_id")).getName()));
+                    return film;
+                });
+    }
+
     public List<Long> getLikes(Long filmId) {
         String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
