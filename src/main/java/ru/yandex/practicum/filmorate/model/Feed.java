@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import ru.yandex.practicum.filmorate.storage.feed.Event;
+import ru.yandex.practicum.filmorate.storage.feed.Operation;
 
 import java.time.LocalDateTime;
 
@@ -11,15 +13,15 @@ public class Feed {
 
     Long userId;
 
-    String event;
+    Event event;
 
-    String operation;
+    Operation operation;
 
     Long eventId;
 
     Long entityId;
 
-    public Feed(LocalDateTime timestamp, Long userId, String event, String operation, Long eventId, Long entityId) {
+    public Feed(LocalDateTime timestamp, Long userId, Event event, Operation operation, Long eventId, Long entityId) {
         this.timestamp = timestamp;
         this.userId = userId;
         this.event = event;

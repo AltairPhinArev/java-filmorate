@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.feed.Event;
+import ru.yandex.practicum.filmorate.storage.feed.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
@@ -60,7 +61,7 @@ public class FilmService {
 
     public void addLike(Long filmId, Long userId) {
         likeDbStorage.addLike(filmId, userId);
-        historyService.updateOperation(userId, Event.LIKE, filmId);
+        historyService.setOperation(userId, Event.LIKE, Operation.ADD, filmId);
     }
 
     public List<Film> getRateFilmsByCount(int count) {
@@ -73,7 +74,7 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
-        historyService.removeOperation(userId, Event.LIKE, filmId);
+        historyService.setOperation(userId, Event.LIKE, Operation.REMOVE, filmId);
     }
 
     private Film validate(Film film) {

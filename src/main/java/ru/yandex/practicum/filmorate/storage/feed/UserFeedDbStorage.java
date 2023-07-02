@@ -17,29 +17,15 @@ public class UserFeedDbStorage {
     public UserFeedDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+    //Изменил enum теперь не нужно все переводить в String в методах
+    //Все теперь проходит через один метод что бы избегать дублирования
+    public void setOperation(Long userId, Event event, Operation operation , Long entityId) {
+        String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, Operation, entityId) " +
+                "VALUES (?,?,?,?,?)";
+        LocalDateTime dateTimeOfOperation = LocalDateTime.now();
+        jdbcTemplate.update(sqlQuery, dateTimeOfOperation, userId, event.name(),
+                operation.name(), entityId);
 
-    public void updateOperation(Long userId, Event event, Long entityId) {
-            String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, Operation, entityId) " +
-                    "VALUES (?,?,?,?,?)";
-            LocalDateTime dateTimeOfOperation = LocalDateTime.now();
-            jdbcTemplate.update(sqlQuery, dateTimeOfOperation, userId, event.toString(),
-                    Operation.UPDATE.toString(), entityId);
-    }
-
-    public void addOperation(Long userId, Event event, Long entityId) {
-            String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, Operation, entityId) " +
-                    "VALUES (?,?,?,?,?)";
-            LocalDateTime dateTimeOfOperation = LocalDateTime.now();
-            jdbcTemplate.update(sqlQuery, dateTimeOfOperation, userId, event.toString(),
-                    Operation.ADD.toString(), entityId);
-    }
-
-    public void removeOperation(Long userId, Event event, Long entityId) {
-            String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, Operation, entityId) " +
-                    "VALUES (?,?,?,?,?)";
-            LocalDateTime dateTimeOfOperation = LocalDateTime.now();
-            jdbcTemplate.update(sqlQuery, dateTimeOfOperation, userId, event.toString(),
-                    Operation.REMOVE.toString(), entityId);
     }
 
     public List<Feed> getFeedByUserId(Long userId) {
@@ -48,22 +34,11 @@ public class UserFeedDbStorage {
         return jdbcTemplate.query(sqlQuery, new Object[]{userId}, (rs, rowNum) -> new Feed(
                         rs.getObject("feed_timestamp", LocalDateTime.class),
                         rs.getLong("user_id"),
-                        rs.getString("event_type"),
-                        rs.getString("operation"),
+                        Event.valueOf(rs.getString("event_type")),
+                        Operation.valueOf(rs.getString("operation")),
                         rs.getLong("eventId"),
                         rs.getLong("entityId")
                 )
         );
     }
 }
-/*
-CREATE TABLE IF NOT EXISTS feeds
-(
-    feed_timestamp TIMESTAMP,
-    user_id bigint REFERENCES users (id) ON DELETE CASCADE,
-    event_type varchar(255),
-    operation varchar(255),
-    eventId bigint generated always as identity primary key,
-    entityId bigint
-);
- */

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.feed.Event;
+import ru.yandex.practicum.filmorate.storage.feed.Operation;
 import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -55,7 +56,7 @@ public class UserService {
 
     public void createFriend(Long userId, Long userFriendId) {
         friendDbStorage.createFriend(userId, userFriendId);
-        historyService.addOperation(userId, Event.FRIEND, userFriendId);
+        historyService.setOperation(userId, Event.FRIEND, Operation.ADD, userFriendId);
     }
 
     public List<User> findAllFriend(Long user) {
@@ -78,7 +79,7 @@ public class UserService {
 
     public void deleteFromFriends(Long userId, Long userFriendId) {
         friendDbStorage.deleteFromFriends(userId, userFriendId);
-        historyService.removeOperation(userId, Event.FRIEND, userFriendId);
+        historyService.setOperation(userId, Event.FRIEND,Operation.REMOVE, userFriendId);
     }
 
     private User validate(User user) {
