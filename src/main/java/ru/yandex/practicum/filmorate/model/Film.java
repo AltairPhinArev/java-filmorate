@@ -27,6 +27,8 @@ public class Film {
 
     private Set<Long> voytedUsers;
 
+    private Set<Director> directors;
+
     @Builder
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
                 Set<Long> voytedUsers, Set<Genre> genres, MPA mpa) {
