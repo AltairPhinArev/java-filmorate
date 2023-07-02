@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
@@ -40,5 +43,17 @@ public class DirectorController {
     @DeleteMapping("/directors/{id}")
     public void removeDirector(@PathVariable int id) {
         service.removeDirectorById(id);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public HttpStatus handleNotFoundException(NotFoundException exception) {
+        return HttpStatus.NOT_FOUND;
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpStatus handleValidationException(ValidationException exception) {
+        return HttpStatus.BAD_REQUEST;
     }
 }
