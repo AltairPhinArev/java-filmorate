@@ -88,6 +88,10 @@ public class FilmDbStorage implements FilmStorage {
             film.setId(generatedId.longValue());
         }
         if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream()
+                    .sorted(Comparator.comparing(Genre::getId))
+                    .collect(Collectors
+                            .toCollection(LinkedHashSet::new)));
             film.getGenres().stream()
                     .forEach(genre -> genreService.addGenreToFilm(film));
         }
@@ -163,4 +167,3 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 }
-

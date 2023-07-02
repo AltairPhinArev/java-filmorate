@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.friendShip;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -51,10 +52,17 @@ public class FriendDbStorage {
     }
 
     public List<User> getFriends(Long userId) {
-        String sql = "SELECT users.id, users.name, users.email, users.login, users.birthday ,FROM friends " +
-                " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new User(rs.getLong("id"),rs.getString("email"),
-                rs.getString("login"),rs.getString("name"),
-                rs.getDate("birthday").toLocalDate()), userId);
+        if (userService.getUserById(userId) != null) {
+            String sql = "SELECT users.id, users.name, users.email, users.login, users.birthday ,FROM friends " +
+                    " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?";
+            return jdbcTemplate.query(sql, (rs, rowNum) -> {
+                User friendUser = new User(rs.getLong("id"), rs.getString("email"),
+                        rs.getString("login"), rs.getString("name"),
+                        rs.getDate("birthday").toLocalDate());
+                return friendUser;
+            }, userId);
+        } else {
+            throw new NotFoundException("User with id" + userId + "doesn't exist");
+        }
     }
 }
