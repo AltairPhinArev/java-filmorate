@@ -71,7 +71,6 @@ public class DirectorService {
     */
     public Optional<Director> getDirectorById(int id) {
         Optional<Director> director = storage.getDirectorById(id);
-
         if (director.isPresent()) {
             log.info("Нашли и вернули режиссера с ID: {}", id);
             return director;

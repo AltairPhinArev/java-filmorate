@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -66,9 +65,6 @@ public class FilmController {
     @GetMapping("/films/director/{directorId}")
     public Set<Film> getFilmsByDirectorId(@PathVariable("directorId") int directorId,
                                           @RequestParam(value = "sortBy", defaultValue = "likes") String sortedBy) {
-        if (!(sortedBy.equals("likes")) && !(sortedBy.equals("year"))) {
-            throw new ValidationException("Можно сортировать только по годам или лайкам");
-        }
         return filmService.getFilmsByDirectorId(directorId, sortedBy);
     }
 

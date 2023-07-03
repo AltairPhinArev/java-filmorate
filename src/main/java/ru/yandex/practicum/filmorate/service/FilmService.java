@@ -84,6 +84,9 @@ public class FilmService {
      Получить и отсортировать сет фильмов по ид режиссера
      */
     public Set<Film> getFilmsByDirectorId(int directorId, String sortBy) {
+        if (!(sortBy.equals("likes")) && !(sortBy.equals("year"))) {
+            throw new ValidationException("Можно сортировать только по годам или лайкам");
+        }
         Optional<Director> director = directorService.getDirectorById(directorId);
         if (director.isPresent()) {
             TreeSet<Film> comparingByYear = new TreeSet<>(
