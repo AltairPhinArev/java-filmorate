@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS friends
 
 CREATE TABLE IF NOT EXISTS feeds
 (
-    feed_timestamp TIMESTAMP,
+    --тип времени переджелал на Лонг
+    feed_timestamp bigint,
     user_id bigint REFERENCES users (id) ON DELETE CASCADE,
     --изменил в схеме типы для ENUM с не большим ограничением на символы
     event_type CHARACTER VARYING (6) NOT NULL,

@@ -1,32 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.storage.feed.Event;
 import ru.yandex.practicum.filmorate.storage.feed.Operation;
 
-import java.time.LocalDateTime;
-
 @Data
+@AllArgsConstructor
 public class Feed {
 
-    LocalDateTime timestamp;
+    Long timestamp;
 
     Long userId;
 
-    Event event;
+    Event eventType;
 
     Operation operation;
 
     Long eventId;
 
     Long entityId;
-
-    public Feed(LocalDateTime timestamp, Long userId, Event event, Operation operation, Long eventId, Long entityId) {
-        this.timestamp = timestamp;
-        this.userId = userId;
-        this.event = event;
-        this.operation = operation;
-        this.eventId = eventId;
-        this.entityId = entityId;
-    }
 }
