@@ -32,12 +32,10 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
                             GenreDbStorage genreDbStorage,
                             LikeDbStorage likeDbStorage,
                             MpaDbStorage mpaDbStorage)
-    {
-        this.jdbcTemplate = jdbcTemplate;
-        this.genreStorage = genreDbStorage;
-        this.likeDbStorage = likeDbStorage;
-        this.mpaStorage = mpaDbStorage;
-    }
+    {this.jdbcTemplate = jdbcTemplate;
+     this.genreStorage = genreDbStorage;
+     this.likeDbStorage = likeDbStorage;
+     this.mpaStorage = mpaDbStorage;}
 
     /*
      Добавляем нового режиссера в хранилище
