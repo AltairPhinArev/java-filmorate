@@ -76,6 +76,7 @@ class FilmorateApplicationTests {
 				.voytedUsers(new HashSet<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 		filmService.createFilm(film1);
 		Assertions.assertEquals(film1, filmService.getFilmById(film1.getId()));
