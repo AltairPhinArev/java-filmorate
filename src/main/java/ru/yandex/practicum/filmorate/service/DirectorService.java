@@ -84,7 +84,7 @@ public class DirectorService {
      Если есть в хранилище, то удаляем режиссера по ид
      */
     public void removeDirectorById(int id) {
-        if(storage.getDirectorById(id).isPresent()) {
+        if (storage.getDirectorById(id).isPresent()) {
             storage.removeDirectorById(id);
             log.info("Удалили режиссера с ID: {}", id);
         } else {
