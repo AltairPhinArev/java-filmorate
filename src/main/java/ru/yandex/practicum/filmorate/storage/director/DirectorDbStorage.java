@@ -28,12 +28,10 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
     MpaDbStorage mpaStorage;
 
     @Autowired
-    public DirectorDbStorage(
-            JdbcTemplate jdbcTemplate,
-            GenreDbStorage genreDbStorage,
-            LikeDbStorage likeDbStorage,
-            MpaDbStorage mpaDbStorage
-    )
+    public DirectorDbStorage(JdbcTemplate jdbcTemplate,
+                            GenreDbStorage genreDbStorage,
+                            LikeDbStorage likeDbStorage,
+                            MpaDbStorage mpaDbStorage)
     {
         this.jdbcTemplate = jdbcTemplate;
         this.genreStorage = genreDbStorage;
