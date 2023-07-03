@@ -96,12 +96,7 @@ public class DirectorService {
     */
     private Optional<Director> validate(@NotNull Director director) {
         if (!director.getName().isEmpty() && !director.getName().isBlank()) {
-            if (director.getId() > 0) {
-                return Optional.of(director);
-            } else {
-                log.error("Некорректный ID режиссера: {}", director.getId());
-                throw new ValidationException("Illegal id from director");
-            }
+            return Optional.of(director);
         } else {
             log.error("Некорректное name режиссера: {}", director.getName());
             throw new ValidationException("Illegal name from director");

@@ -10,11 +10,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.*;
 
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -36,6 +35,8 @@ class FilmorateApplicationTests {
 	private final FilmDbStorage filmStorage;
 	private final FilmService filmService;
 	private final UserService userService;
+
+	private final DirectorService directorService;
 
 	@Test
 	void testCreateUser() {
@@ -229,5 +230,45 @@ class FilmorateApplicationTests {
 		assertThat(userService.findCommonFriends(user1.getId(), user2.getId())).hasSize(1);
 		assertThat(userService.findCommonFriends(user1.getId(), user2.getId()))
 				.contains(user3);
+	}
+
+	@Test
+	public void directorTests() {
+		Director director1 = new Director();
+		director1.setName("Director");
+
+		Director director2 = new Director();
+		director2.setName("Other Director");
+
+		Director directorToUpdate = new Director();
+		directorToUpdate.setId(1);
+		directorToUpdate.setName("Updated Director");
+
+		directorService.createDirector(director1);
+
+		assertThat(directorService.getDirectorById(1))
+				.isPresent()
+						.hasValueSatisfying(director -> assertThat(director)
+								.hasFieldOrPropertyWithValue("name", "Director"));
+
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 1);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(director1));
+
+		directorService.createDirector(director2);
+
+		Assertions.assertEquals(directorService.getDirectorById(2).get(), director2);
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(director2));
+
+		directorService.updateDirector(directorToUpdate);
+
+		Assertions.assertEquals(directorService.getDirectorById(1).get(), directorToUpdate);
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(directorToUpdate));
+		Assertions.assertFalse(directorService.getDirectorSet().contains(director1));
+
+		directorService.removeDirectorById(2);
+
+		Assertions.assertThrows(NotFoundException.class, () -> directorService.getDirectorById(2));
 	}
 }
