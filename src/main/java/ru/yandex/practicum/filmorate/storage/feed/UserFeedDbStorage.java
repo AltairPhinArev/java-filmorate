@@ -9,7 +9,6 @@ import java.util.List;
 
 @Component
 public class UserFeedDbStorage {
-    //TODO без ревью тесты не проходят нужны отзовы
     JdbcTemplate jdbcTemplate;
 
     @Autowired
