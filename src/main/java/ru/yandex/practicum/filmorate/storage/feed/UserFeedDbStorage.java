@@ -19,6 +19,7 @@ public class UserFeedDbStorage {
     Все теперь проходит через один метод что бы избегать дублирования
     Формат timestamp приведен к запрашиваемому
      */
+
     public void setOperation(Long userId, Event event, Operation operation, Long entityId) {
         String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, operation, entityId) " +
                 "VALUES (?,?,?,?,?)";
