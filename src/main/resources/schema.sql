@@ -12,14 +12,13 @@ CREATE TABLE IF NOT EXISTS films
     description  varchar(200),
     release_date date         NOT NULL,
     duration     int          NOT NULL,
-    rating_id    int          NOT NULL REFERENCES ratings_mpa (id) ON DELETE RESTRICT,
-    director_id  int
+    rating_id    int          NOT NULL REFERENCES ratings_mpa (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS directors
 (
     id int PRIMARY KEY,
-    name varchar(255)
+    name varchar(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS film_directors

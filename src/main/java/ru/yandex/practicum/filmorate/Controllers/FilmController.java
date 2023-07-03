@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class FilmController {
@@ -59,6 +61,15 @@ public class FilmController {
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
         filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    public Set<Film> getFilmsByDirectorId(@PathVariable("directorId") int directorId,
+                                          @RequestParam(value = "sortBy", defaultValue = "likes") String sortedBy) {
+        if (!(sortedBy.equals("likes")) && !(sortedBy.equals("year"))) {
+            throw new ValidationException("Можно сортировать только по годам или лайкам");
+        }
+        return filmService.getFilmsByDirectorId(directorId, sortedBy);
     }
 
     @ExceptionHandler(NotFoundException.class)

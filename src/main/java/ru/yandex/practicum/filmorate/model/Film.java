@@ -31,7 +31,7 @@ public class Film {
 
     @Builder
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
-                Set<Long> voytedUsers, Set<Genre> genres, MPA mpa) {
+                Set<Long> voytedUsers, Set<Genre> genres, MPA mpa, Set<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,5 +40,6 @@ public class Film {
         this.voytedUsers = voytedUsers;
         this.genres = genres;
         this.mpa = mpa;
+        this.directors = directors;
     }
 }

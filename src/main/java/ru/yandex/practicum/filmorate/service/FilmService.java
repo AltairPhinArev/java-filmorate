@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -21,16 +25,20 @@ public class FilmService {
 
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
+
+    DirectorService directorService;
+
     JdbcTemplate jdbcTemplate;
 
     private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
-                       JdbcTemplate jdbcTemplate) {
+                       JdbcTemplate jdbcTemplate, DirectorService directorService) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
+        this.directorService = directorService;
     }
 
     public Collection<Film> findAll() {
@@ -69,6 +77,57 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
+    }
+
+
+    /*
+     Получить и отсортировать сет фильмов по ид режиссера
+     */
+    public Set<Film> getFilmsByDirectorId(int directorId, String sortBy) {
+        Optional<Director> director = directorService.getDirectorById(directorId);
+        if (director.isPresent()) {
+            TreeSet<Film> comparingByYear = new TreeSet<>(
+                    Comparator.comparing(Film::getReleaseDate)
+            );
+
+            TreeSet<Film> comparingByLikes = new TreeSet<>(
+                    (o1, o2) -> {
+                        if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
+                            return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
+                        } else {
+                            return (int) (o1.getId() - o2.getId());
+                        }
+                    }
+            );
+
+            List<Integer> filmsId = getFilmsIds(directorId);
+            Set<Film> films = new HashSet<>();
+            for (Integer integer : filmsId) {
+                films.add(getFilmById(((long) integer)));
+            }
+
+            switch (sortBy) {
+                case "year":
+                    comparingByYear.addAll(films);
+                    return comparingByYear;
+                case "likes":
+                    comparingByLikes.addAll(films);
+                    return comparingByLikes;
+                default:
+                    throw new NotFoundException("Не получилось собрать фильмы по режиссеру");
+            }
+        } else {
+            throw new NotFoundException(String.format("Не нашли режиссера с ID: %d", directorId));
+        }
+    }
+
+    private List<Integer> getFilmsIds(int directorId) {
+        String sqlQuery = "SELECT * FROM film_directors WHERE director_id=?";
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> getFilmsId(rs), directorId);
+    }
+
+    private int getFilmsId(ResultSet rs) throws SQLException {
+        return rs.getInt("film_id");
     }
 
     private Film validate(Film film) {

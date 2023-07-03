@@ -9,8 +9,7 @@ import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -29,7 +28,6 @@ public class DirectorService {
      */
     public Director createDirector(Director director) {
         if (validate(director).isPresent()) {
-            log.info("Добавили нового режиссера с ID: {}", director.getId());
             return storage.createDirector(director);
         } else {
             return null;
@@ -71,17 +69,14 @@ public class DirectorService {
     /*
      Если нашли возвращаем режиссера по ID, если нет бросаем NotFoundException
     */
-    public Director getDirectorById(int id) {
-        try {
-            Optional<Director> director = storage.getDirectorById(id);
-            if (director.isPresent()) {
-                log.info("Нашли и вернули режиссера с ID: {}", id);
-                return director.get();
-            } else {
-                throw new RuntimeException(String.format("Режиссер с ID: %d не найден", id));
-            }
-        } catch (RuntimeException exception) {
-            throw new NotFoundException(exception.getMessage());
+    public Optional<Director> getDirectorById(int id) {
+        Optional<Director> director = storage.getDirectorById(id);
+
+        if (director.isPresent()) {
+            log.info("Нашли и вернули режиссера с ID: {}", id);
+            return director;
+        } else {
+            throw new NotFoundException(String.format("Режиссер с ID: %d не найден", id));
         }
     }
 
@@ -101,7 +96,7 @@ public class DirectorService {
      Проверяем входящего режиссера на корректность полей
     */
     private Optional<Director> validate(@NotNull Director director) {
-        if (!director.getName().isEmpty()) {
+        if (!director.getName().isEmpty() && !director.getName().isBlank()) {
             if (director.getId() > 0) {
                 return Optional.of(director);
             } else {

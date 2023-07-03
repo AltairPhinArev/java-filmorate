@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -27,7 +28,12 @@ public class DirectorController {
 
     @GetMapping("/directors/{id}")
     public Director getDirectorById(@PathVariable int id) {
-        return service.getDirectorById(id);
+        Optional<Director> director = service.getDirectorById(id);
+        if (director.isPresent()) {
+            return director.get();
+        } else {
+            throw new NotFoundException(String.format("Не нашли режиссера с ID: %d", id));
+        }
     }
 
     @PostMapping("/directors")

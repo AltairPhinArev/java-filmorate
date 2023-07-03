@@ -11,18 +11,19 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
-import java.sql.Statement;
+import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,15 +35,19 @@ public class FilmDbStorage implements FilmStorage {
     GenreService genreService;
     LikeDbStorage likeDbStorage;
 
+    DirectorDbStorage directorStorage;
+
     private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService,
-                         LikeDbStorage likeDbStorage, GenreService genreService) {
+                         LikeDbStorage likeDbStorage, GenreService genreService,
+                         DirectorDbStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaService = mpaService;
         this.likeDbStorage = likeDbStorage;
         this.genreService = genreService;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -57,7 +62,8 @@ public class FilmDbStorage implements FilmStorage {
                         new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
-                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
+                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
+                        new HashSet<>(directorStorage.getDirectorsByFilmId(rs.getInt("id"))))
         )
         );
     }
@@ -91,6 +97,10 @@ public class FilmDbStorage implements FilmStorage {
             film.getGenres().stream()
                     .forEach(genre -> genreService.addGenreToFilm(film));
         }
+        if (film.getDirectors() != null) {
+            film.getDirectors().forEach(director -> directorStorage.addDirectorToFilm(film));
+        }
+
         log.info("film has been created");
         return film;
     }
@@ -119,6 +129,21 @@ public class FilmDbStorage implements FilmStorage {
                 }
             }
             genreService.reNewGenre(film);
+
+            if (film.getDirectors() != null) {
+                if (!film.getDirectors().isEmpty()) {
+                    Set<Director> directors = new HashSet<>();
+                    for (Director director : film.getDirectors()) {
+                        Optional<Director> oDirector = directorStorage.getDirectorById(director.getId());
+                        oDirector.ifPresent(directors::add);
+                    }
+                    film.setDirectors(directors);
+                    directorStorage.addDirectorToFilm(film);
+                }
+            } else {
+                directorStorage.removeDirectorByFilmId(film.getId());
+            }
+
             log.info("film has been updated");
             return film;
         } else {
@@ -144,7 +169,8 @@ public class FilmDbStorage implements FilmStorage {
                     filmRows.getInt("duration"),
                     new HashSet<>(likeDbStorage.getLikes(filmRows.getLong("id"))),
                     new HashSet<>(genreService.getGenresByFilmId(filmId)),
-                    mpaService.getMpaRateById(filmRows.getInt("rating_id")));
+                    mpaService.getMpaRateById(filmRows.getInt("rating_id")),
+                    new HashSet<>(directorStorage.getDirectorsByFilmId(filmRows.getInt("id"))));
         } else {
             throw new NotFoundException("Film Not founded by id" + filmId);
         }
