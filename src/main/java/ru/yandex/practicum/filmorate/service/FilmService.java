@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,16 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@Slf4j
 public class FilmService {
 
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
     JdbcTemplate jdbcTemplate;
 
-    private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
+    public FilmService( FilmStorage filmStorage, LikeDbStorage likeDbStorage,
                        JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;

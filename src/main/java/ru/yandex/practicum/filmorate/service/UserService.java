@@ -19,7 +19,7 @@ public class UserService {
     UserStorage userStorage;
     FriendDbStorage friendDbStorage;
 
-    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage, FriendDbStorage friendDbStorage) {
+    public UserService(UserStorage userStorage, FriendDbStorage friendDbStorage) {
         this.userStorage = userStorage;
         this.friendDbStorage = friendDbStorage;
     }

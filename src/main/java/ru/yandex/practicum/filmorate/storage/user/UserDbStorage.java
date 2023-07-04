@@ -17,7 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
 
-@Component("UserDbStorage")
+@Component
 public class UserDbStorage implements UserStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -116,5 +116,12 @@ public class UserDbStorage implements UserStorage {
         } else {
             throw new NotFoundException("NOT FOUND");
         }
+    }
+
+    public boolean userExists(Long userId) {
+        String sql = "SELECT COUNT(*) FROM users " +
+                "WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 }
