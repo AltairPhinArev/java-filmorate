@@ -62,4 +62,9 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Can't find User");
         }
     }
+
+    @Override
+    public boolean isUserPresent(Long id) {
+        return userById.containsKey(id);
+    }
 }

@@ -14,6 +14,8 @@ public interface UserStorage {
 
     User getUserById(Long id);
 
+    boolean isUserPresent(Long id);
+
     void deleteUserById(Long id);
 }
 

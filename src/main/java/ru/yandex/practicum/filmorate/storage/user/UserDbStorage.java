@@ -16,6 +16,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 
 @Component("UserDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -105,6 +106,13 @@ public class UserDbStorage implements UserStorage {
             log.error("NOT FOUNDED USER");
             throw new NotFoundException(e.getMessage());
         }
+    }
+
+    @Override
+    public boolean isUserPresent(Long id) {
+        String sqlQuery = "SELECT count(*) as c FROM users WHERE id = ?";
+        List<Long> count = jdbcTemplate.query(sqlQuery, (r, n) -> r.getLong("c"), id);
+        return count.get(0) > 0;
     }
 
     @Override
