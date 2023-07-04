@@ -27,7 +27,7 @@ public class FilmService {
 
 
     @Autowired
-    public FilmService( FilmStorage filmStorage, LikeDbStorage likeDbStorage,
+    public FilmService(FilmStorage filmStorage, LikeDbStorage likeDbStorage,
                        JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;

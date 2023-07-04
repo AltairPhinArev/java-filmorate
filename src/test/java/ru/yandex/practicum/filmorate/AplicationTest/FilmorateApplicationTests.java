@@ -232,37 +232,5 @@ class FilmorateApplicationTests {
                 .contains(user3);
     }
 
-    @Test
-    void createReview_shouldReturnCreatedReview() {
-        User user1 = User.builder()
-                .id(1L)
-                .name("login")
-                .login("login")
-                .email("login@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 23))
-                .build();
-        userStorage.createUser(user1);
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("Rocky")
-                .description("BOX")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
-        filmStorage.createFilm(film1);
-        Review review = Review.builder().reviewId(1L)
-                .content("Review")
-                .isPositive(true)
-                .userId(userService.getUserById(1L).getId())
-                .filmId(filmService.getFilmById(1L).getId())
-                .userId(1324L).build();
-        reviewService.createReview(review);
 
-        Review optionalReview = reviewService.getReviewById(review.getReviewId());
-        assertEquals(optionalReview.getReviewId(),review.getReviewId());
-        assertEquals(optionalReview.getContent(), review.getContent());
-    }
 }

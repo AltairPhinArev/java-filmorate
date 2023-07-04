@@ -32,7 +32,7 @@ public class UserService {
 
     public User createUser(User user) {
         validate(user);
-       return userStorage.createUser(user);
+        return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {

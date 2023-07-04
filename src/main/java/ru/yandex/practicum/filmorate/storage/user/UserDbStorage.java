@@ -93,11 +93,11 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
                 User user = new User(
-                resultSet.getLong("id"),
-                resultSet.getString("email"),
-                resultSet.getString("login"),
-                resultSet.getString("name"),
-                resultSet.getDate("birthday").toLocalDate()
+                        resultSet.getLong("id"),
+                        resultSet.getString("email"),
+                        resultSet.getString("login"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("birthday").toLocalDate()
                 );
                 return user;
             });
@@ -111,8 +111,8 @@ public class UserDbStorage implements UserStorage {
     public void deleteUserById(Long id) {
         String sqlQuery = "DELETE FROM users";
         if (getUserById(id) != null) {
-         jdbcTemplate.update(sqlQuery, id);
-         log.info("User has been deleted with ID={}", id);
+            jdbcTemplate.update(sqlQuery, id);
+            log.info("User has been deleted with ID={}", id);
         } else {
             throw new NotFoundException("NOT FOUND");
         }

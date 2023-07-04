@@ -48,16 +48,16 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
         return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getDate("release_date").toLocalDate(),
-                rs.getInt("duration"),
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getDate("release_date").toLocalDate(),
+                        rs.getInt("duration"),
                         new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-        )
+                )
         );
     }
 
