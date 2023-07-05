@@ -17,6 +17,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DirectorDbStorage {  // Класс отвечающий за общение с хранилищем режиссеров
 
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     /*

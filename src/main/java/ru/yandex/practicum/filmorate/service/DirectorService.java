@@ -15,6 +15,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__ (@Autowired))
 public class DirectorService {
 
+    @Autowired
     private final DirectorDbStorage storage;
 
     /*
