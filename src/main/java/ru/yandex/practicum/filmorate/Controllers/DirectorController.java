@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 @RestController
@@ -31,12 +32,12 @@ public class DirectorController {
     }
 
     @PostMapping("/directors")
-    public Director createDirector(@RequestBody Director director) {
+    public Director createDirector(@Valid @RequestBody Director director) {
         return service.createDirector(director);
     }
 
     @PutMapping("/directors")
-    public Director updateDirector(@RequestBody Director director) {
+    public Director updateDirector(@Valid @RequestBody Director director) {
         return service.updateDirector(director);
     }
 
