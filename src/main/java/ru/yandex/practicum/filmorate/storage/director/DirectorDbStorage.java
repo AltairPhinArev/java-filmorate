@@ -14,11 +14,15 @@ import java.util.*;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DirectorDbStorage {  // Класс отвечающий за общение с хранилищем режиссеров
 
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     /*
      Добавляем нового режиссера в хранилище

@@ -12,16 +12,19 @@ import java.util.*;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__ (@Autowired))
 public class DirectorService {
 
-    @Autowired
     private final DirectorDbStorage storage;
 
+    @Autowired
+    public DirectorService(DirectorDbStorage storage) {
+        this.storage = storage;
+    }
+
     /*
-     Добавляем нового режиссера, при условии, что он имеет корректные поля,
-     в противном случае бросаем ValidationException
-     */
+         Добавляем нового режиссера, при условии, что он имеет корректные поля,
+         в противном случае бросаем ValidationException
+         */
     public Director createDirector(Director director) {
         return storage.createDirector(director);
     }
