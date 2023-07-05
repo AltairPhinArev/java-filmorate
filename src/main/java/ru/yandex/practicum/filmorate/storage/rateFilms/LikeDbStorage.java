@@ -56,7 +56,6 @@ public class LikeDbStorage {
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName())),
                 count);
-
     }
 
     public List<Long> getLikes(Long filmId) {
