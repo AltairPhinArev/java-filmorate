@@ -8,7 +8,7 @@ import java.util.Set;
 @Data
 public class Film {
 
-    private Long id;
+    private Integer id;
 
     private String name;
 
@@ -22,18 +22,18 @@ public class Film {
 
     private MPA mpa;
 
-    private Set<Long> voytedUsers;
+    private Set<Integer> voytedUsers;
 
     private Set<Director> directors;
 
-    public Film(long id,
+    public Film(Integer id,
                 String name,
                 String description,
                 LocalDate releaseDate,
                 int duration,
                 Set<Genre> genres,
                 MPA mpa,
-                Set<Long> voytedUsers,
+                Set<Integer> voytedUsers,
                 Set<Director> directors) {
         this.id = id;
         this.name = name;
@@ -46,14 +46,14 @@ public class Film {
         this.directors = directors;
     }
 
-    public Film(Long id,
+    public Film(Integer id,
                 String name,
                 String description,
                 LocalDate releaseDate,
                 Integer duration,
                 Set<Genre> genres,
                 MPA mpa,
-                Set<Long> voytedUsers) {
+                Set<Integer> voytedUsers) {
         this.id = id;
         this.name = name;
         this.description = description;

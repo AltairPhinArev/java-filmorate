@@ -32,7 +32,7 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> findAll() {
         String sqlQuery = "SELECT * FROM users";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> new User(
-                rs.getLong("id"),
+                rs.getInt("id"),
                 rs.getString("email"),
                 rs.getString("login"),
                 rs.getString("name"),
@@ -59,7 +59,7 @@ public class UserDbStorage implements UserStorage {
 
         Number userId = keyHolder.getKey();
         if (userId != null) {
-            user.setId(userId.longValue());
+            user.setId(userId.intValue());
         }
         log.info("User has been created with ID={}", user.getId());
         return user;
@@ -88,18 +88,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(Integer id) {
         String sqlQuery = "SELECT * FROM users WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
-                User user = new User(
-                resultSet.getLong("id"),
+                return new User(
+                resultSet.getInt("id"),
                 resultSet.getString("email"),
                 resultSet.getString("login"),
                 resultSet.getString("name"),
                 resultSet.getDate("birthday").toLocalDate()
                 );
-                return user;
             });
         } catch (EmptyResultDataAccessException e) {
             log.error("NOT FOUNDED USER");
@@ -108,7 +107,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteUserById(Integer id) {
         String sqlQuery = "DELETE FROM users";
         if (getUserById(id) != null) {
          jdbcTemplate.update(sqlQuery, id);

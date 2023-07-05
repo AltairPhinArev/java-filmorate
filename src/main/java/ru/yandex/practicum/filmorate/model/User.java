@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 public class User {
 
-    private Long id;
+    private Integer id;
 
     @Email
     private String email;
@@ -25,7 +25,7 @@ public class User {
     private Set<User> friends = new HashSet<>();
 
     @Builder
-    public User(Long id, String email, String login, String name, LocalDate birthday) {
+    public User(Integer id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
         this.email = email;
         this.login = login;

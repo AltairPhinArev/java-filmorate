@@ -55,15 +55,15 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public Film getFilmById(Long id) {
+    public Film getFilmById(Integer id) {
         return filmStorage.getFilmById(id);
     }
 
-    public void deleteFilmById(Long id) {
+    public void deleteFilmById(Integer id) {
         filmStorage.deleteFilmById(id);
     }
 
-    public void addLike(Long filmId, Long userId) {
+    public void addLike(Integer filmId, Integer userId) {
         likeDbStorage.addLike(filmId, userId);
     }
 
@@ -71,11 +71,11 @@ public class FilmService {
         return likeDbStorage.getRateFilmsByCount(count);
     }
 
-    public List<Long> getLikes(Long filmId) {
+    public List<Integer> getLikes(Integer filmId) {
         return likeDbStorage.getLikes(filmId);
     }
 
-    public void deleteLike(Long filmId, Long userId) {
+    public void deleteLike(Integer filmId, Integer userId) {
         likeDbStorage.deleteLike(filmId, userId);
     }
 
@@ -98,7 +98,7 @@ public class FilmService {
                         if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
                             return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
                         } else {
-                            return (int) (o1.getId() - o2.getId());
+                            return o1.getId() - o2.getId();
                         }
                     }
             );
@@ -106,7 +106,7 @@ public class FilmService {
             List<Integer> filmsId = getFilmsIds(directorId);
             Set<Film> films = new HashSet<>();
             for (Integer integer : filmsId) {
-                films.add(getFilmById(((long) integer)));
+                films.add(getFilmById((integer)));
             }
 
             switch (sortBy) {

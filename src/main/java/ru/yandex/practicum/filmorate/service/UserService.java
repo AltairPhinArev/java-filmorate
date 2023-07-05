@@ -40,23 +40,23 @@ public class UserService {
         return userStorage.updateUser(user);
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(Integer id) {
         return userStorage.getUserById(id);
     }
 
-    public void deleteUserById(Long id) {
+    public void deleteUserById(Integer id) {
         userStorage.deleteUserById(id);
     }
 
-    public void createFriend(Long userId, Long userFriendId) {
+    public void createFriend(Integer userId, Integer userFriendId) {
         friendDbStorage.createFriend(userId, userFriendId);
     }
 
-    public List<User> findAllFriend(Long user) {
+    public List<User> findAllFriend(Integer user) {
         return friendDbStorage.getFriends(user);
     }
 
-    public List<User> findCommonFriends(Long firstUserId, Long secondUserId) {
+    public List<User> findCommonFriends(Integer firstUserId, Integer secondUserId) {
 
         User user = getUserById(firstUserId);
         User commonUser = getUserById(secondUserId);
@@ -67,10 +67,10 @@ public class UserService {
             commonFriends = new HashSet<>(friendDbStorage.getFriends(firstUserId));
             commonFriends.retainAll(friendDbStorage.getFriends(secondUserId));
         }
-        return new ArrayList<User>(commonFriends);
+        return new ArrayList<>(commonFriends);
     }
 
-    public void deleteFromFriends(Long user, Long otherUser) {
+    public void deleteFromFriends(Integer user, Integer otherUser) {
         friendDbStorage.deleteFromFriends(user, otherUser);
     }
 

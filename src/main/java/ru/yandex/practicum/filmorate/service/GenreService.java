@@ -42,7 +42,7 @@ public class GenreService {
         genreDbStorage.addGenreToFilm(film);
     }
 
-    public Set<Genre> getGenresByFilmId(Long filmId) {
+    public Set<Genre> getGenresByFilmId(Integer filmId) {
         return new HashSet<>(genreDbStorage.getFilmGenres(filmId));
     }
 }

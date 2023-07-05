@@ -54,15 +54,15 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
         return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film(
-                rs.getLong("id"),
+                rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
-                        new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
+                        new HashSet<>(genreService.getGenresByFilmId(rs.getInt("id"))),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
-                        new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
+                        new HashSet<>(likeDbStorage.getLikes(rs.getInt("id"))),
                         new HashSet<>(directorStorage.getDirectorsByFilmId(rs.getInt("id"))))
         )
         );
@@ -91,11 +91,10 @@ public class FilmDbStorage implements FilmStorage {
 
         Number generatedId = keyHolder.getKey();
         if (generatedId != null) {
-            film.setId(generatedId.longValue());
+            film.setId(generatedId.intValue());
         }
         if (film.getGenres() != null) {
-            film.getGenres().stream()
-                    .forEach(genre -> genreService.addGenreToFilm(film));
+            film.getGenres().forEach(genre -> genreService.addGenreToFilm(film));
         }
         if (film.getDirectors() != null) {
             film.getDirectors().forEach(director -> directorStorage.addDirectorToFilm(film));
@@ -152,7 +151,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(Long filmId) {
+    public Film getFilmById(Integer filmId) {
         String sqlQuery = "SELECT * FROM films WHERE id = ?";
 
         if (filmId == null) {
@@ -162,14 +161,14 @@ public class FilmDbStorage implements FilmStorage {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sqlQuery, filmId);
         if (filmRows.first()) {
             film = new Film(
-                    filmRows.getLong("id"),
+                    filmRows.getInt("id"),
                     filmRows.getString("name"),
                     filmRows.getString("description"),
-                    filmRows.getDate("release_date").toLocalDate(),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
                     filmRows.getInt("duration"),
                     new HashSet<>(genreService.getGenresByFilmId(filmId)),
                     mpaService.getMpaRateById(filmRows.getInt("rating_id")),
-                    new HashSet<>(likeDbStorage.getLikes(filmRows.getLong("id"))),
+                    new HashSet<>(likeDbStorage.getLikes(filmRows.getInt("id"))),
                     new HashSet<>(directorStorage.getDirectorsByFilmId(filmRows.getInt("id"))));
         } else {
             throw new NotFoundException("Film Not founded by id" + filmId);
@@ -178,7 +177,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilmById(Long filmId) {
+    public void deleteFilmById(Integer filmId) {
         String sqlQuery = "DELETE FROM films WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sqlQuery, filmId);
 

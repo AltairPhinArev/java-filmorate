@@ -19,7 +19,7 @@ public class FriendDbStorage {
         this.userService = userService;
     }
 
-    public void createFriend(Long userId, Long friendId) {
+    public void createFriend(Integer userId, Integer friendId) {
         boolean friendStatus = false;
 
         User user  = userService.getUserById(userId);
@@ -37,7 +37,7 @@ public class FriendDbStorage {
         jdbcTemplate.update(sql, userId, friendId, friendStatus);
     }
 
-    public void deleteFromFriends(Long userId, Long userFriendId) {
+    public void deleteFromFriends(Integer userId, Integer userFriendId) {
         if ((userService.getUserById(userFriendId) != null) && (userService.getUserById(userFriendId) != null)) {
             String sql = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
             jdbcTemplate.update(sql, userId, userFriendId);
@@ -51,14 +51,13 @@ public class FriendDbStorage {
         }
     }
 
-    public List<User> getFriends(Long userId) {
+    public List<User> getFriends(Integer userId) {
         String sql = "SELECT users.id, users.name, users.email, users.login, users.birthday ,FROM friends " +
                 " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            User friendUser = new User(rs.getLong("id"),rs.getString("email"),
+            return new User(rs.getInt("id"),rs.getString("email"),
                     rs.getString("login"),rs.getString("name"),
                     rs.getDate("birthday").toLocalDate());
-            return friendUser;
         }, userId);
     }
 }

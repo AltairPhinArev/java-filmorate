@@ -16,9 +16,9 @@ import java.util.HashMap;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private Long userId = 1L;
+    private Integer userId = 1;
     private static final Logger log = LogManager.getLogger(User.class);
-    private final HashMap<Long, User> userById = new HashMap<>();
+    private final HashMap<Integer, User> userById = new HashMap<>();
 
     @Override
     public Collection<User> findAll() {
@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteUserById(Integer id) {
         if (userById.containsKey(id)) {
             userById.remove(id);
         } else {
@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(Integer id) {
         if (userById.containsKey(id)) {
             return userById.get(id);
         } else {

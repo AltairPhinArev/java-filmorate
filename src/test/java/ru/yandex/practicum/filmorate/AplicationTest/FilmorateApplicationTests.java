@@ -41,7 +41,7 @@ class FilmorateApplicationTests {
 	@Test
 	void testCreateUser() {
 		User user = User.builder()
-				.id(0L)
+				.id(0)
 				.name("ANtonY")
 				.login("technojew")
 				.birthday(LocalDate.of(1975, 11, 19))
@@ -53,12 +53,12 @@ class FilmorateApplicationTests {
 	@Test
 	public void testCreateFilm() {
 		Film film1 = new Film(
-				1L,
+				1,
 				"Fighting club",
 				"2 = 1",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
@@ -70,7 +70,7 @@ class FilmorateApplicationTests {
 	@Test
 	public void testGetFilmById() {
 		Film film1 = new Film(
-				1L,
+				1,
 				"Alisa",
 				"eat me",
 				LocalDate.of(1975, 11, 19),
@@ -87,23 +87,23 @@ class FilmorateApplicationTests {
 	@Test
 	public void testGetAllFilms() {
 		Film film1 = new Film(
-				1L,
+				1,
 				"Charly and Chocolate Fabric",
 				"Johny Depp",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
 
 		Film film2 = new Film(
-				2L,
+				2,
 				"SuperFast",
 				"---",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
@@ -118,23 +118,23 @@ class FilmorateApplicationTests {
 	@Test
 	public void testRemoveFilmById() {
 		Film film1 = new Film(
-				1L,
+				1,
 				"superFast 100",
 				"The last of last of last",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
 
 		Film film2 = new Film(
-				2L,
+				2,
 				"FightigngClub",
 				"",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
@@ -152,7 +152,7 @@ class FilmorateApplicationTests {
 	@Test
 	public void testFindUserById() {
 		User user1 = User.builder()
-				.id(4L)
+				.id(4)
 				.name("Dmitriy")
 				.login("FRIGH")
 				.email("Dmitriy@mail.ru")
@@ -172,18 +172,18 @@ class FilmorateApplicationTests {
 	@Test
 	public void testAddLike() {
 		Film film1 = new Film(
-				1L,
+				1,
 				"Rocky",
 				"BOX",
 				LocalDate.of(1975, 11, 19),
 				133,
-				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new HashSet<>(List.of(new Genre(2, "Драма"))),
 				new MPA(4, "R"),
 				new HashSet<>(),
 				new HashSet<>());
 
 		User user1 = User.builder()
-				.id(1L)
+				.id(1)
 				.name("Dmitriy")
 				.login("FRIGH")
 				.email("Dmitriy@mail.ru")
@@ -202,7 +202,7 @@ class FilmorateApplicationTests {
 	@Test
 	public void testGetCommonFriends() {
 		User user1 = User.builder()
-				.id(1L)
+				.id(1)
 				.name("login")
 				.login("login")
 				.email("login@mail.ru")
@@ -210,7 +210,7 @@ class FilmorateApplicationTests {
 				.build();
 
 		User user2 = User.builder()
-				.id(2L)
+				.id(2)
 				.name("login")
 				.login("login")
 				.email("login@mail.ru")
@@ -218,7 +218,7 @@ class FilmorateApplicationTests {
 				.build();
 
 		User user3 = User.builder()
-				.id(3L)
+				.id(3)
 				.name("login")
 				.login("login")
 				.email("anton@mail.ru")

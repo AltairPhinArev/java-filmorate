@@ -14,9 +14,9 @@ import java.util.HashMap;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private Long filmId = 1L;
+    private Integer filmId = 1;
     private static final Logger log = LogManager.getLogger(Film.class);
-    private final HashMap<Long, Film> filmById = new HashMap<>();
+    private final HashMap<Integer, Film> filmById = new HashMap<>();
 
     @Override
     public Collection<Film> findAll() {
@@ -44,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(Long id) {
+    public Film getFilmById(Integer id) {
         if (filmById.containsKey(id)) {
             return filmById.get(id);
         } else {
@@ -53,7 +53,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilmById(Long id) {
+    public void deleteFilmById(Integer id) {
         if (filmById.containsKey(id)) {
             filmById.remove(id);
         } else {

@@ -60,7 +60,7 @@ public class GenreDbStorage {
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
     }
 
-    public List<Genre> getFilmGenres(Long filmId) {
+    public List<Genre> getFilmGenres(Integer filmId) {
         String sql = "SELECT genre_id, name FROM film_genres" +
                 " INNER JOIN genres ON genre_id = id WHERE film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> new Genre(

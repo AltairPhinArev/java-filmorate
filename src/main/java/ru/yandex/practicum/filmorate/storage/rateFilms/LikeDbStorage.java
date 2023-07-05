@@ -40,7 +40,7 @@ public class LikeDbStorage {
         this.directorStorage = directorStorage;
     }
 
-    public void addLike(Long filmId, Long userId) {
+    public void addLike(Integer filmId, Integer userId) {
         String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
         log.info("you just liked film");
@@ -53,27 +53,27 @@ public class LikeDbStorage {
 
         log.info("Top films by count{}", count);
         return jdbcTemplate.query(getPopularQuery, (rs, rowNum) -> new Film(
-                        rs.getLong("id"),
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("description"),
                         rs.getDate("release_Date").toLocalDate(),
                         rs.getInt("duration"),
-                        genreService.getGenresByFilmId(rs.getLong("id")),
+                        genreService.getGenresByFilmId(rs.getInt("id")),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
-                        new HashSet<>(getLikes(rs.getLong("id"))),
+                        new HashSet<>(getLikes(rs.getInt("id"))),
                         directorStorage.getDirectorsByFilmId(rs.getInt("id"))),
                 count);
 
     }
 
-    public List<Long> getLikes(Long filmId) {
+    public List<Integer> getLikes(Integer filmId) {
         String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
-                rs.getLong("user_id"), filmId);
+                rs.getInt("user_id"), filmId);
     }
 
-    public void deleteLike(Long filmId, Long userId) {
+    public void deleteLike(Integer filmId, Integer userId) {
         String checkQuery = "SELECT COUNT(*) FROM film_likes WHERE film_id = ? AND user_id = ?";
 
         try {
