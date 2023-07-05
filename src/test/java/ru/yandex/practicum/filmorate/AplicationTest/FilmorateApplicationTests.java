@@ -246,23 +246,20 @@ class FilmorateApplicationTests {
 
 		directorService.createDirector(director1);
 
-		assertThat(directorService.getDirectorById(1))
-				.isPresent()
-						.hasValueSatisfying(director -> assertThat(director)
-								.hasFieldOrPropertyWithValue("name", "Director"));
+		assertThat(directorService.getDirectorById(1)).hasFieldOrPropertyWithValue("name", "Director");
 
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 1);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(director1));
 
 		directorService.createDirector(director2);
 
-		Assertions.assertEquals(directorService.getDirectorById(2).get(), director2);
+		Assertions.assertEquals(directorService.getDirectorById(2), director2);
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(director2));
 
 		directorService.updateDirector(directorToUpdate);
 
-		Assertions.assertEquals(directorService.getDirectorById(1).get(), directorToUpdate);
+		Assertions.assertEquals(directorService.getDirectorById(1), directorToUpdate);
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(directorToUpdate));
 		Assertions.assertFalse(directorService.getDirectorSet().contains(director1));

@@ -1,43 +1,23 @@
 package ru.yandex.practicum.filmorate.storage.director;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.mapper.DirectorMapper;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.ratingMPA.MpaDbStorage;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DirectorDbStorage {  // Класс отвечающий за общение с хранилищем режиссеров
 
     private final JdbcTemplate jdbcTemplate;
-
-    GenreDbStorage genreStorage;
-
-    LikeDbStorage likeDbStorage;
-
-    MpaDbStorage mpaStorage;
-
-    @Autowired
-    public DirectorDbStorage(JdbcTemplate jdbcTemplate,
-                            GenreDbStorage genreDbStorage,
-                            LikeDbStorage likeDbStorage,
-                            MpaDbStorage mpaDbStorage) {
-
-        this.jdbcTemplate = jdbcTemplate;
-        this.genreStorage = genreDbStorage;
-        this.likeDbStorage = likeDbStorage;
-        this.mpaStorage = mpaDbStorage;
-    }
 
     /*
      Добавляем нового режиссера в хранилище
@@ -55,8 +35,8 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
         String sqlQuery = "INSERT INTO directors (id, name)" +
                         " VALUES(?, ?)";
 
-        log.info("Добавили нового режиссера с ID: {}", director.getId());
         jdbcTemplate.update(sqlQuery, director.getId(), director.getName());
+        log.info("Добавили нового режиссера с ID: {}", director.getId());
         return director;
     }
 
@@ -69,6 +49,7 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
                 "SET id=?, name=? " +
                 "WHERE id=?";
         jdbcTemplate.update(sqlQuery, director.getId(), director.getName(), director.getId());
+        log.info("Обновили режиссера с ID: {}", director.getId());
         return director;
     }
 
@@ -79,7 +60,9 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
     public Set<Director> getDirectorsSet() {
         String sqlQuery = "SELECT * " +
                 "FROM directors";
-        return new HashSet<>(jdbcTemplate.query(sqlQuery, new DirectorMapper()));
+        HashSet<Director> directors = new HashSet<>(jdbcTemplate.query(sqlQuery, new DirectorMapper()));
+        log.info("Достали список режиссеров");
+        return directors;
     }
 
     /*
@@ -89,8 +72,11 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
         String sqlQuery = "SELECT * " +
                 "FROM directors " +
                 "WHERE id=?";
-
-        return jdbcTemplate.query(sqlQuery, new DirectorMapper(), id).stream().findAny();
+        Director director = jdbcTemplate.query(sqlQuery, new DirectorMapper(), id).stream()
+                .findAny()
+                .orElseThrow(() -> new NotFoundException(String.format("Не нашли режиссера с ID: %d", id)));
+        log.info("Достали режиссера с ID: {}", id);
+        return Optional.of(director);
     }
 
     /*
@@ -99,6 +85,7 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
     public void removeDirectorById(int id) {
         String sqlQuery = "DELETE FROM directors WHERE id=?";
         jdbcTemplate.update(sqlQuery, id);
+        log.info("Удалили режиссера с ID: {}", id);
     }
 
     /*
@@ -108,6 +95,7 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
         String sqlQuery = "INSERT INTO film_directors (film_id, director_id)" +
                 " VALUES(?, ?)";
         film.getDirectors().forEach(director -> jdbcTemplate.update(sqlQuery, film.getId(), director.getId()));
+        log.info("Закинули режиссеров фильма с ID: {} в хранилище", film.getId());
     }
 
     /*
@@ -117,12 +105,15 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
         String sqlQuery = "SELECT * FROM film_directors AS fd" +
                 " LEFT JOIN directors AS d ON fd.director_id=d.id" +
                 " WHERE film_id=?";
-        return new HashSet<>(jdbcTemplate.query(sqlQuery, new DirectorMapper(), filmId));
+        HashSet<Director> directors = new HashSet<>(jdbcTemplate.query(sqlQuery, new DirectorMapper(), filmId));
+        log.info("Достали список режиссеров фильма с ID: {}", filmId);
+        return directors;
     }
 
     public void removeDirectorByFilmId(long filmId) {
         String sqlQuery = "DELETE FROM film_directors WHERE film_id=?";
         jdbcTemplate.update(sqlQuery, filmId);
+        log.info("Удалили режиссера у фильма с ID: {}", filmId);
     }
 
     /*
@@ -132,14 +123,7 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
     private List<Integer> getDirectorsId() {
         String sqlQuery = "SELECT * " +
                 "FROM directors";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNun) -> getId(rs));
+        return jdbcTemplate.query(sqlQuery, (rs, rowNun) -> rs.getInt("id"));
 
     }
-
-    private int getId(ResultSet rs) throws SQLException {
-        return rs.getInt("id");
-    }
-
-
-
 }

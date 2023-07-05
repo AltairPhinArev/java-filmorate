@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
@@ -26,7 +26,7 @@ public class FilmService {
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
 
-    DirectorService directorService;
+    DirectorDbStorage directorStorage;
 
     JdbcTemplate jdbcTemplate;
 
@@ -34,11 +34,11 @@ public class FilmService {
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
-                       JdbcTemplate jdbcTemplate, DirectorService directorService) {
+                       JdbcTemplate jdbcTemplate, DirectorDbStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
-        this.directorService = directorService;
+        this.directorStorage = directorStorage;
     }
 
     public Collection<Film> findAll() {
@@ -87,40 +87,37 @@ public class FilmService {
         if (!(sortBy.equals("likes")) && !(sortBy.equals("year"))) {
             throw new ValidationException("Можно сортировать только по годам или лайкам");
         }
-        Optional<Director> director = directorService.getDirectorById(directorId);
-        if (director.isPresent()) {
-            TreeSet<Film> comparingByYear = new TreeSet<>(
-                    Comparator.comparing(Film::getReleaseDate)
-            );
+        directorStorage.getDirectorById(directorId)
+                .orElseThrow(() -> new NotFoundException(String.format("Не нашли режиссера с ID: %d", directorId)));
+        TreeSet<Film> comparingByYear = new TreeSet<>(
+            Comparator.comparing(Film::getReleaseDate)
+        );
 
-            TreeSet<Film> comparingByLikes = new TreeSet<>(
-                    (o1, o2) -> {
-                        if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
-                            return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
-                        } else {
-                            return (int) (o1.getId() - o2.getId());
-                        }
-                    }
-            );
-
-            List<Integer> filmsId = getFilmsIds(directorId);
-            Set<Film> films = new HashSet<>();
-            for (Integer integer : filmsId) {
-                films.add(getFilmById(((long) integer)));
+        TreeSet<Film> comparingByLikes = new TreeSet<>(
+            (o1, o2) -> {
+                if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
+                    return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
+                } else {
+                    return (int) (o1.getId() - o2.getId());
+                }
             }
+        );
 
-            switch (sortBy) {
-                case "year":
-                    comparingByYear.addAll(films);
-                    return comparingByYear;
-                case "likes":
-                    comparingByLikes.addAll(films);
-                    return comparingByLikes;
-                default:
-                    throw new NotFoundException("Не получилось собрать фильмы по режиссеру");
-            }
-        } else {
-            throw new NotFoundException(String.format("Не нашли режиссера с ID: %d", directorId));
+        List<Integer> filmsId = getFilmsIds(directorId);
+        Set<Film> films = new HashSet<>();
+        for (Integer integer : filmsId) {
+            films.add(getFilmById(((long) integer)));
+        }
+
+        switch (sortBy) {
+            case "year":
+                 comparingByYear.addAll(films);
+                 return comparingByYear;
+            case "likes":
+                comparingByLikes.addAll(films);
+                return comparingByLikes;
+            default:
+                throw new NotFoundException("Не получилось собрать фильмы по режиссеру");
         }
     }
 
