@@ -58,7 +58,7 @@ public class LikeDbStorage {
                         rs.getString("description"),
                         rs.getDate("release_Date").toLocalDate(),
                         rs.getInt("duration"),
-                        new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
+                        genreService.getGenresByFilmId(rs.getLong("id")),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
                         new HashSet<>(getLikes(rs.getLong("id"))),
