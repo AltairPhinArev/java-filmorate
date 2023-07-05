@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -26,9 +24,8 @@ public class Film {
 
     private Set<Long> voytedUsers;
 
-    private HashSet<Director> directors;
+    private Set<Director> directors;
 
-    @Builder
     public Film(long id,
                 String name,
                 String description,
@@ -37,7 +34,7 @@ public class Film {
                 Set<Genre> genres,
                 MPA mpa,
                 Set<Long> voytedUsers,
-                HashSet<Director> directors) {
+                Set<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;

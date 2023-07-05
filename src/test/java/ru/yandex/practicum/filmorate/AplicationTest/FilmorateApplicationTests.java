@@ -52,59 +52,62 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testCreateFilm() {
-		Film film1 = Film.builder()
-				.id(1L)
-				.name("Fighting club")
-				.description("2 = 1")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.voytedUsers(new HashSet<>())
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film1 = new Film(
+				1L,
+				"Fighting club",
+				"2 = 1",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
+
 
 		Assertions.assertEquals(film1, filmService.createFilm(film1));
 	}
 
 	@Test
 	public void testGetFilmById() {
-		Film film1 = Film.builder()
-				.id(1L)
-				.name("Alisa")
-				.description("eat me")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.voytedUsers(new HashSet<>())
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.directors(new HashSet<>())
-				.build();
+		Film film1 = new Film(
+				1L,
+				"Alisa",
+				"eat me",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Set.of(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
+
 		filmService.createFilm(film1);
 		Assertions.assertEquals(film1, filmService.getFilmById(film1.getId()));
 	}
 
 	@Test
 	public void testGetAllFilms() {
-		Film film1 = Film.builder()
-				.id(1L)
-				.name("Charly and Chocolate Fabric")
-				.description("Johny Depp")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.voytedUsers(new HashSet<>())
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film1 = new Film(
+				1L,
+				"Charly and Chocolate Fabric",
+				"Johny Depp",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
 
-		Film film2 = Film.builder()
-				.id(2L)
-				.name("SuperFast")
-				.description("---")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film2 = new Film(
+				2L,
+				"SuperFast",
+				"---",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
+
 
 		filmService.createFilm(film1);
 		filmService.createFilm(film2);
@@ -114,26 +117,28 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testRemoveFilmById() {
-		Film film1 = Film.builder()
-				.id(1L)
-				.name("superFast 100")
-				.description("The last of last of last")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.voytedUsers(new HashSet<>())
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film1 = new Film(
+				1L,
+				"superFast 100",
+				"The last of last of last",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
 
-		Film film2 = Film.builder()
-				.id(2L)
-				.name("FightigngClub")
-				.description("")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film2 = new Film(
+				2L,
+				"FightigngClub",
+				"",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
+
 
 		filmService.createFilm(film1);
 		filmService.createFilm(film2);
@@ -166,16 +171,17 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testAddLike() {
-		Film film1 = Film.builder()
-				.id(1L)
-				.name("Rocky")
-				.description("BOX")
-				.releaseDate(LocalDate.of(1975, 11, 19))
-				.duration(133)
-				.voytedUsers(new HashSet<>())
-				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-				.mpa(new MPA(4, "R"))
-				.build();
+		Film film1 = new Film(
+				1L,
+				"Rocky",
+				"BOX",
+				LocalDate.of(1975, 11, 19),
+				133,
+				new HashSet<>(Arrays.asList(new Genre(2, "Драма"))),
+				new MPA(4, "R"),
+				new HashSet<>(),
+				new HashSet<>());
+
 		User user1 = User.builder()
 				.id(1L)
 				.name("Dmitriy")
