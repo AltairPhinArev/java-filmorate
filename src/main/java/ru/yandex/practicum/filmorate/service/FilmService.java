@@ -54,7 +54,6 @@ public class FilmService {
     public void deleteFilmById(Long id) {
         filmStorage.deleteFilmById(id);
     }
-
     public List<Film> commonFilms(Long userId, Long friendId) {
         return likeDbStorage.findCommonFilms(userId, friendId);
     }

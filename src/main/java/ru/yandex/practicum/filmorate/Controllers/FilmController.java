@@ -25,7 +25,6 @@ public class FilmController {
     public Collection<Film> findAllFilms() {
         return filmService.findAll();
     }
-
     @GetMapping(value = "/films/{id}")
     public Film getFilmById(@PathVariable Long id) {
         return filmService.getFilmById(id);
