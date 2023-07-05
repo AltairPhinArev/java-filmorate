@@ -94,7 +94,12 @@ public class FilmDbStorage implements FilmStorage {
             film.setId(generatedId.intValue());
         }
         if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream()
+                    .sorted(Comparator.comparing(Genre::getId))
+                    .collect(Collectors
+                    .toCollection(LinkedHashSet::new)));
             film.getGenres().forEach(genre -> genreService.addGenreToFilm(film));
+
         }
         if (film.getDirectors() != null) {
             film.getDirectors().forEach(director -> directorStorage.addDirectorToFilm(film));
@@ -104,7 +109,7 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-
+    @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, " + "rating_id = ? WHERE id = ?";

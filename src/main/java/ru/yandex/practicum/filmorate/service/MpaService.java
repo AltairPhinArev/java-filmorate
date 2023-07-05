@@ -15,7 +15,6 @@ public class MpaService {
     MpaDbStorage mpaDbStorage;
 
     @Autowired
-
     public MpaService(MpaDbStorage mpaDbStorage) {
         this.mpaDbStorage = mpaDbStorage;
     }

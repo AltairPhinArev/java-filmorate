@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.friendShip;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
@@ -49,7 +50,7 @@ public class FriendDbStorage {
                 jdbcTemplate.update(sql, userFriendId, userId, false, userFriendId, userId);
             }
         }
-    }
+    }    
 
     public List<User> getFriends(Integer userId) {
         String sql = "SELECT users.id, users.name, users.email, users.login, users.birthday ,FROM friends " +
@@ -59,5 +60,8 @@ public class FriendDbStorage {
                     rs.getString("login"),rs.getString("name"),
                     rs.getDate("birthday").toLocalDate());
         }, userId);
+        } else {
+            throw new NotFoundException("User with id" + userId + "doesn't exist");
+        }
     }
 }
