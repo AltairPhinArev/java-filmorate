@@ -18,8 +18,6 @@ public class Film {
 
     private Integer duration;
 
-    private Integer rate = 0;
-
     private Set<Genre> genres;
 
     private MPA mpa;
