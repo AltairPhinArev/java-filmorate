@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,11 +25,15 @@ public class LikeDbStorage {
     MpaService mpaService;
     GenreService genreService;
 
+    private final DirectorDbStorage directorStorage;
+
     @Autowired
-    public LikeDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService) {
+    public LikeDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService,
+                         DirectorDbStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaService = mpaService;
         this.genreService = genreService;
+        this.directorStorage = directorStorage;
     }
 
     public void addLike(Long filmId, Long userId) {
@@ -52,7 +57,8 @@ public class LikeDbStorage {
                         new HashSet<>(getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
-                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()), null),
+                        mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
+                        directorStorage.getDirectorsByFilmId(rs.getLong("id"))),
                 count);
 
     }

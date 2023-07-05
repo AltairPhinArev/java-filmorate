@@ -9,8 +9,6 @@ import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.mapper.DirectorMapper;
-import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.ratingMPA.MpaDbStorage;
 
 import java.util.*;
 
@@ -21,12 +19,6 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
 
     @Autowired
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private final LikeDbStorage likeDbStorage;
-
-    @Autowired
-    private final MpaDbStorage mpaStorage;
 
     /*
      Добавляем нового режиссера в хранилище
