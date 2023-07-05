@@ -59,10 +59,10 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getString("description"),
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
-                        new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
+                        new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
                         new HashSet<>(directorStorage.getDirectorsByFilmId(rs.getInt("id"))))
         )
         );
@@ -167,9 +167,9 @@ public class FilmDbStorage implements FilmStorage {
                     filmRows.getString("description"),
                     filmRows.getDate("release_date").toLocalDate(),
                     filmRows.getInt("duration"),
-                    new HashSet<>(likeDbStorage.getLikes(filmRows.getLong("id"))),
                     new HashSet<>(genreService.getGenresByFilmId(filmId)),
                     mpaService.getMpaRateById(filmRows.getInt("rating_id")),
+                    new HashSet<>(likeDbStorage.getLikes(filmRows.getLong("id"))),
                     new HashSet<>(directorStorage.getDirectorsByFilmId(filmRows.getInt("id"))));
         } else {
             throw new NotFoundException("Film Not founded by id" + filmId);
