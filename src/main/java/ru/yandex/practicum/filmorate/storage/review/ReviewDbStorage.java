@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.Exceptions.CreateReviewException;
+import ru.yandex.practicum.filmorate.Exceptions.LikeReviewException;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.RemoveReviewException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -42,7 +45,7 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review createReview(Review newReview) {
         try {
             newReview.setUseful(0);
-            String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful_count) VALUES (?, ?, ?, ?, ?);";
+            String sql = ReviewSqlQueries.CREATE_REVIEW;
             KeyHolder keyHolder = new GeneratedKeyHolder();
             int rowsAffected = jdbcTemplate.update(
                     connection -> {
@@ -71,10 +74,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review updatedReview) {
-        // С точки зрения логики, отсальные поля не нужны, так как если добавить film_id & user_id
-        //то будет подразумеваться, что отзыв будет перенесен на другой фильм или прсвоен другому пользователю
-        //поле useful меняется только при добавлении или удалении лайка, а не при обнолении отзыва
-        String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id =?;";
+        log.info("Обновление отзыва под id:{}", updatedReview.getReviewId());
+        String sql = ReviewSqlQueries.UPDATE_REVIEW;
         int affectedRows = jdbcTemplate.update(sql,
                 updatedReview.getContent(),
                 updatedReview.getIsPositive(),
@@ -83,15 +84,18 @@ public class ReviewDbStorage implements ReviewStorage {
             log.warn("Попытка обновить отзыв с id: {}. Отзыв не найден", updatedReview.getReviewId());
             throw new NotFoundException("Отзыв с указанным ID не найден: " + updatedReview.getReviewId());
         } else {
-            log.info("Отзыв под id:{} обновлен", updatedReview.getReviewId());
-            return updatedReview;
+            String sqlQuery = ReviewSqlQueries.FIND_REVIEW_BY_ID;
+            Review updatedReviewInDb = jdbcTemplate.queryForObject(sqlQuery, reviewRowMapper, updatedReview.getReviewId());
+            log.info("Отзыв под id:{} обновлен", updatedReviewInDb.getReviewId());
+            System.out.println(updatedReviewInDb.toString());
+            return updatedReviewInDb;
         }
     }
 
     @Override
     public boolean removeReview(Long deletedReviewId) {
         try {
-            String sql = "DELETE FROM reviews WHERE review_id = ?";
+            String sql = ReviewSqlQueries.REMOVE_REVIEW;
             int rowsAffected = jdbcTemplate.update(sql, deletedReviewId);
             if (rowsAffected > 0) {
                 log.info("Отзыв под id: {} удален", deletedReviewId);
@@ -106,18 +110,11 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
+    @Cacheable("reviews")
     @Override
     public Optional<Review> getReviewById(Long reviewId) {
         try {
-            String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
-                    //Так как у нас всего 2 варианта реакций (лайк/дизлайк), то используем
-                    //CASE выражение внутри SUM функции для подсчета лайков (1) и дизлайков (-1)
-                    "SUM(CASE WHEN rl.reaction = 'LIKE' THEN 1 WHEN rl.reaction = 'DISLIKE' THEN -1 ELSE 0 END) " +
-                    "AS useful_count " +
-                    "FROM reviews r " +
-                    "LEFT JOIN review_reactions rl on r.review_id = rl.review_id " +
-                    "WHERE r.review_id = ? " +
-                    "GROUP BY r.review_id, r.content, r.is_positive, r.user_id, r.film_id";
+            String sql = ReviewSqlQueries.GET_REVIEW_BY_ID;
             Review review = jdbcTemplate.queryForObject(sql, reviewRowMapper, reviewId);
             log.info("Отзыв под id:{} получен", reviewId);
             return Optional.of(review);
@@ -127,79 +124,94 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
+    @Cacheable("allReviews")
     @Override
     public List<Review> getAllReviews(Long filmId, int count) {
         String sql;
         if (filmId == null) {
-            sql = "SELECT * FROM reviews LIMIT ?";
+            sql = ReviewSqlQueries.GET_ALL_REVIEWS;
             List<Review> allReviewsWithoutFilmId = jdbcTemplate.query(sql, reviewRowMapper, count);
             log.info("Получен список всех отзывов, независимо от идентификатора фильма");
             return allReviewsWithoutFilmId;
         } else {
-            sql = "SELECT * FROM reviews WHERE film_id = ? LIMIT ?";
+            sql = ReviewSqlQueries.GET_ALL_REVIEWS_BY_FILM_ID;
             log.info("Получен список всех отзывов, для фильма под id% {}", filmId);
             return jdbcTemplate.query(sql, reviewRowMapper, filmId, count);
         }
     }
 
-
-    //Мне необходимо предусмотреть, тот факт, что каждый пользователь может в любое время пометь свое мнение с 'LIKE'
-    //на 'DISLIKE' без необходимости перед этим удалять свою реацию. Для этого я буду использовать запрос с 'MERGE',
-    //который будет работать как "вставить или обновить", в записимости от того, есть ли запись в таблице.
-    //Ссылка на источник: https://www.tutorialspoint.com/h2_database/h2_database_merge.htm
+    @Transactional
     @Override
     public void likeReview(Long reviewId, Long userId) {
-        String sql = "MERGE INTO review_reactions (user_id, review_id, reaction) KEY (user_id, review_id) VALUES (?, ?, 'LIKE')";
-        jdbcTemplate.update(sql, userId, reviewId);
-        incrementUsefulCount(reviewId); //count+1
-        log.info("Добавлен 'лайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
+        try {
+            String sql = ReviewSqlQueries.LIKE_REVIEW;
+            jdbcTemplate.update(sql, userId, reviewId);
+            incrementUsefulCount(reviewId); //count+1
+            log.info("Добавлен 'лайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка при добавлении лайка к отзыву с id: {}", reviewId, ex);
+            throw new LikeReviewException("Ошибка при добавлении лайка к отзыву с id: " + reviewId, ex);
+        }
     }
 
-
+    @Transactional
     @Override
     public void dislikeReview(Long reviewId, Long userId) {
-        String sql = "MERGE INTO review_reactions (user_id, review_id, reaction) KEY (user_id, review_id) VALUES (?, ?, 'DISLIKE')";
-        jdbcTemplate.update(sql, userId, reviewId);
-        decrementUsefulCount(reviewId); //count-1
-        log.info("Добавлен 'дизлайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
+        try {
+            String sql = ReviewSqlQueries.DISLIKE_REVIEW;
+            jdbcTemplate.update(sql, userId, reviewId);
+            decrementUsefulCount(reviewId); //count-1
+            log.info("Добавлен 'дизлайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка при добавлении дизлайка к отзыву с id: {}", reviewId, ex);
+            throw new LikeReviewException("Ошибка при добавлении дизлайка к отзыву с id: " + reviewId, ex);
+        }
     }
 
-    //Здесь мы, кроме всего прочего, обрабатываем ситуацию, когда пользователь пытается удалить лайк, но на
-    //данный момент у него стоит дизлайк, и наоборот.
+    @Transactional
     @Override
     public void removeLike(Long reviewId, Long userId) {
-        String sql = "DELETE FROM review_reactions WHERE user_id = ? AND review_id = ?";
-        int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
-        if (rowsAffected > 0) {
-            decrementUsefulCount(reviewId); //count-1
+        try {
+            String sql = ReviewSqlQueries.REMOVE_LIKE;
+            int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
+            if (rowsAffected > 0) {
+                decrementUsefulCount(reviewId); //count-1
+            }
+            log.info("'Лайк' от пользователя с id: {} к отзыву под id: {} был удален", userId, reviewId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка при удалении лайка с отзыва под id: {}", reviewId, ex);
+            throw new LikeReviewException("Ошибка удалении лайка с отзыва под id: " + reviewId, ex);
         }
-        log.info("'Лайк' от пользователя с id: {} к отзыву под id: {} был удален", userId, reviewId);
     }
 
+    @Transactional
     @Override
     public void removeDislike(Long reviewId, Long userId) {
-        String sql = "DELETE FROM review_reactions WHERE user_id = ? AND review_id = ?";
-        int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
-        if (rowsAffected > 0) {
-            incrementUsefulCount(reviewId); //count+1
+        try {
+            String sql = ReviewSqlQueries.REMOVE_DISLIKE;
+            int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
+            if (rowsAffected > 0) {
+                incrementUsefulCount(reviewId); //count+1
+            }
+            log.info("'Дизлайк' от пользователя с id: {} к отзыву под id: {} был удален", userId, reviewId);
+        } catch (DataAccessException ex) {
+            log.error("Произошла ошибка при удалении дизлайка с отзыва под id: {}", reviewId, ex);
+            throw new LikeReviewException("Ошибка удалении дизлайка с отзыва под id: " + reviewId, ex);
         }
-        log.info("'Дизлайк' от пользователя с id: {} к отзыву под id: {} был удален", userId, reviewId);
     }
 
-    //Для избежания дублирования кода, добавил 2 приватных метода
     private void incrementUsefulCount(Long reviewId) {
-        String sql = "UPDATE reviews SET useful_count = useful_count + 1 WHERE review_id = ?";
+        String sql = ReviewSqlQueries.UPDATE_REVIEW_INCREMENT_USEFUL_COUNT;
         jdbcTemplate.update(sql, reviewId);
     }
 
     private void decrementUsefulCount(Long reviewId) {
-        String sql = "UPDATE reviews SET useful_count = useful_count - 1 WHERE review_id = ?";
+        String sql = ReviewSqlQueries.UPDATE_REVIEW_DECREMENT_USEFUL_COUNT;
         jdbcTemplate.update(sql, reviewId);
     }
 
     public boolean reviewExists(Long reviewId) {
-        String sql = "SELECT COUNT(*) FROM REVIEWS " +
-                "WHERE REVIEW_ID = ?";
+        String sql = ReviewSqlQueries.CHECK_REVIEW_EXIST;
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reviewId);
         return count != null && count > 0;
     }
