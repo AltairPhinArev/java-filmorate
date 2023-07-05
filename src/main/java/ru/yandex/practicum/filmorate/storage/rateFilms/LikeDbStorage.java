@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.rateFilms;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,13 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 
 @Component
+@Slf4j
 public class LikeDbStorage {
 
     JdbcTemplate jdbcTemplate;
     MpaService mpaService;
     GenreService genreService;
-
-    private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
     public LikeDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService) {
