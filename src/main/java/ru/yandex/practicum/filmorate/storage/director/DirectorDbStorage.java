@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.mapper.DirectorMapper;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.ratingMPA.MpaDbStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,22 +18,9 @@ public class DirectorDbStorage {  // Класс отвечающий за общ
 
     private final JdbcTemplate jdbcTemplate;
 
-    GenreDbStorage genreStorage;
-
-    LikeDbStorage likeDbStorage;
-
-    MpaDbStorage mpaStorage;
-
     @Autowired
-    public DirectorDbStorage(JdbcTemplate jdbcTemplate,
-                            GenreDbStorage genreDbStorage,
-                            LikeDbStorage likeDbStorage,
-                            MpaDbStorage mpaDbStorage) {
-
+    public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.genreStorage = genreDbStorage;
-        this.likeDbStorage = likeDbStorage;
-        this.mpaStorage = mpaDbStorage;
     }
 
     /*
