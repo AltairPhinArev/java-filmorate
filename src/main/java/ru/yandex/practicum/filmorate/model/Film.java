@@ -1,13 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class Film {
 
     private Long id;
@@ -28,15 +31,15 @@ public class Film {
 
     private Set<Director> directors;
 
-    public Film(Long id,
+    public Film(long id,
                 String name,
                 String description,
                 LocalDate releaseDate,
-                Integer duration,
-                Set<Genre> genres,
+                int duration,
+                HashSet<Genre> genres,
                 MPA mpa,
-                Set<Long> voytedUsers,
-                Set<Director> directors) {
+                HashSet<Long> voytedUsers,
+                HashSet<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;
