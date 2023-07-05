@@ -20,7 +20,6 @@ import java.util.List;
 
 @Component
 public class LikeDbStorage {
-
     JdbcTemplate jdbcTemplate;
     MpaService mpaService;
     GenreService genreService;
