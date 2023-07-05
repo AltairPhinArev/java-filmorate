@@ -23,7 +23,7 @@ public class FilmController {
 
     @GetMapping(value = "/films")
     public Collection<Film> findAllFilms() {
-       return filmService.findAll();
+        return filmService.findAll();
     }
 
     @GetMapping(value = "/films/{id}")
@@ -32,8 +32,11 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films/popular")
-    public List<Film> getMostPopularFilmByCount(@RequestParam (defaultValue = "10") Integer count) {
-        return filmService.getRateFilmsByCount(count);
+    public List<Film> getMostPopularFilmByCount(
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            @RequestParam(value = "genreId", required = false) Integer genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        return filmService.getRateFilmsByCount(limit, genreId, year);
     }
 
     @PostMapping(value = "/films")

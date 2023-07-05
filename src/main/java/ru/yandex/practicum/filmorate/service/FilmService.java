@@ -59,8 +59,8 @@ public class FilmService {
         likeDbStorage.addLike(filmId, userId);
     }
 
-    public List<Film> getRateFilmsByCount(int count) {
-        return likeDbStorage.getRateFilmsByCount(count);
+    public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {
+        return likeDbStorage.getRateFilmsByCount(limit, genreId, year);
     }
 
     public List<Long> getLikes(Long filmId) {
