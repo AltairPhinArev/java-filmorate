@@ -62,7 +62,7 @@ public class LikeDbStorage {
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
                         new HashSet<>(getLikes(rs.getLong("id"))),
-                        new HashSet<>(directorStorage.getDirectorsByFilmId(rs.getInt("id")))),
+                        directorStorage.getDirectorsByFilmId(rs.getInt("id"))),
                 count);
 
     }
