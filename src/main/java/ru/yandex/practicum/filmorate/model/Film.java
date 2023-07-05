@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class Film {
 
     private Long id;
@@ -25,7 +27,6 @@ public class Film {
     private Set<Long> voytedUsers;
 
     private Set<Director> directors;
-
 
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
                 Set<Long> voytedUsers, Set<Genre> genres, MPA mpa, Set<Director> directors) {
