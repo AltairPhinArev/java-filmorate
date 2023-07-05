@@ -45,4 +45,25 @@ public class Film {
         this.voytedUsers = voytedUsers;
         this.directors = directors;
     }
+
+    public Film(Long id,
+                String name,
+                String description,
+                LocalDate releaseDate,
+                Integer duration,
+                Set<Genre> genres,
+                MPA mpa,
+                Set<Long> voytedUsers) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.genres = genres;
+        this.mpa = mpa;
+        this.voytedUsers = voytedUsers;
+    }
+
+    public Film() {
+    }
 }
