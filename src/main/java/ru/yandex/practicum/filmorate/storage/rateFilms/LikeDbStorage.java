@@ -45,6 +45,7 @@ public class LikeDbStorage {
                 "GROUP BY films.id ORDER BY COUNT(film_likes.user_id) DESC LIMIT ?";
 
         log.info("Top films by count{}", count);
+
         return jdbcTemplate.query(getPopularQuery, (rs, rowNum) -> new Film(
                         rs.getLong("id"),
                         rs.getString("name"),
@@ -54,7 +55,8 @@ public class LikeDbStorage {
                         new HashSet<>(getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
-                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()), null),
+                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
+                        null),
                 count);
 
     }
