@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -29,7 +28,7 @@ public class Film {
 
     private Set<Director> directors;
 
-    @Builder
+
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
                 Set<Long> voytedUsers, Set<Genre> genres, MPA mpa, Set<Director> directors) {
         this.id = id;
