@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -52,10 +51,10 @@ public class Film {
                 String description,
                 LocalDate releaseDate,
                 int duration,
-                HashSet<Genre> genres,
+                Set<Genre> genres,
                 MPA mpa,
-                HashSet<Long> voytedUsers,
-                HashSet<Director> directors) {
+                Set<Long> voytedUsers,
+                Set<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;
