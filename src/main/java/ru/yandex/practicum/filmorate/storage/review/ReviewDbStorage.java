@@ -84,10 +84,9 @@ public class ReviewDbStorage implements ReviewStorage {
             log.warn("Попытка обновить отзыв с id: {}. Отзыв не найден", updatedReview.getReviewId());
             throw new NotFoundException("Отзыв с указанным ID не найден: " + updatedReview.getReviewId());
         } else {
-            String sqlQuery = ReviewSqlQueries.FIND_REVIEW_BY_ID;
+            String sqlQuery = ReviewSqlQueries.GET_REVIEW_BY_ID;
             Review updatedReviewInDb = jdbcTemplate.queryForObject(sqlQuery, reviewRowMapper, updatedReview.getReviewId());
             log.info("Отзыв под id:{} обновлен", updatedReviewInDb.getReviewId());
-            System.out.println(updatedReviewInDb.toString());
             return updatedReviewInDb;
         }
     }
