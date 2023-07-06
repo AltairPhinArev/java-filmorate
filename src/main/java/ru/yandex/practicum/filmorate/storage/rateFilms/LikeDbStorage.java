@@ -46,17 +46,19 @@ public class LikeDbStorage {
 
         log.info("Top films by count{}", count);
 
-        return jdbcTemplate.query(getPopularQuery, (rs, rowNum) -> new Film(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getDate("release_Date").toLocalDate(),
-                        rs.getInt("duration"),
-                        new HashSet<>(getLikes(rs.getLong("id"))),
-                        new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
-                        new MPA(rs.getInt("rating_id"),
-                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
-                        null),
+        return jdbcTemplate.query(getPopularQuery, (rs, rowNum) ->
+                        Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_Date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
+                .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
+                .mpa(new MPA(rs.getInt("rating_id"),
+                        mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
+                .directors(new HashSet<>())
+                .build(),
                 count);
 
     }
