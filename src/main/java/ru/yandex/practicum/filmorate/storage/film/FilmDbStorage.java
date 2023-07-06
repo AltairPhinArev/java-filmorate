@@ -53,18 +53,19 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getDate("release_date").toLocalDate(),
-                rs.getInt("duration"),
-                        new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
-                        new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
-                        new MPA(rs.getInt("rating_id"),
-                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()),
-                        new HashSet<>(directorStorage.getDirectorsByFilmId(rs.getInt("id"))))
-        )
+        return jdbcTemplate.query(sql, ((rs, rowNum) ->
+                        Film.builder()
+                                .id(rs.getLong("id"))
+                                .name(rs.getString("name"))
+                                .description(rs.getString("description"))
+                                .releaseDate(rs.getDate("release_Date").toLocalDate())
+                                .duration(rs.getInt("duration"))
+                                .voytedUsers(new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))))
+                                .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
+                                .mpa(new MPA(rs.getInt("rating_id"),
+                                        mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
+                                .directors(directorStorage.getDirectorsByFilmId(rs.getInt("id")))
+                                .build())
         );
     }
 
@@ -94,8 +95,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setId(generatedId.longValue());
         }
         if (film.getGenres() != null) {
-            film.getGenres().stream()
-                    .forEach(genre -> genreService.addGenreToFilm(film));
+            film.getGenres().forEach(genre -> genreService.addGenreToFilm(film));
         }
         if (film.getDirectors() != null) {
             film.getDirectors().forEach(director -> directorStorage.addDirectorToFilm(film));
@@ -161,16 +161,18 @@ public class FilmDbStorage implements FilmStorage {
         Film film;
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sqlQuery, filmId);
         if (filmRows.first()) {
-            film = new Film(
-                    filmRows.getLong("id"),
-                    filmRows.getString("name"),
-                    filmRows.getString("description"),
-                    filmRows.getDate("release_date").toLocalDate(),
-                    filmRows.getInt("duration"),
-                    new HashSet<>(likeDbStorage.getLikes(filmRows.getLong("id"))),
-                    new HashSet<>(genreService.getGenresByFilmId(filmId)),
-                    mpaService.getMpaRateById(filmRows.getInt("rating_id")),
-                    new HashSet<>(directorStorage.getDirectorsByFilmId(filmRows.getInt("id"))));
+            film = Film.builder()
+                    .id(filmRows.getLong("id"))
+                    .name(filmRows.getString("name"))
+                    .description(filmRows.getString("description"))
+                    .releaseDate(Objects.requireNonNull(filmRows.getDate("release_Date")).toLocalDate())
+                    .duration(filmRows.getInt("duration"))
+                    .voytedUsers(new HashSet<>(likeDbStorage.getLikes(filmId)))
+                    .genres(new HashSet<>(genreService.getGenresByFilmId(filmId)))
+                    .mpa(new MPA(filmRows.getInt("rating_id"),
+                            mpaService.getMpaRateById(filmRows.getInt("rating_id")).getName()))
+                    .directors(directorStorage.getDirectorsByFilmId(filmId))
+                    .build();
         } else {
             throw new NotFoundException("Film Not founded by id" + filmId);
         }
