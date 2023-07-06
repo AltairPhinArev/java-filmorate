@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.util.Set;
 
+@RequestMapping("/directors")
 @RestController
 public class DirectorController {
 
@@ -20,27 +21,27 @@ public class DirectorController {
         this.service = service;
     }
 
-    @GetMapping("/directors")
+    @GetMapping
     public Set<Director> getDirectorSet() {
         return service.getDirectorSet();
     }
 
-    @GetMapping("/directors/{id}")
+    @GetMapping("/{id}")
     public Director getDirectorById(@PathVariable int id) {
         return service.getDirectorById(id).get();
     }
 
-    @PostMapping("/directors")
+    @PostMapping
     public Director createDirector(@RequestBody Director director) {
         return service.createDirector(director);
     }
 
-    @PutMapping("/directors")
+    @PutMapping
     public Director updateDirector(@RequestBody Director director) {
         return service.updateDirector(director);
     }
 
-    @DeleteMapping("/directors/{id}")
+    @DeleteMapping("/{id}")
     public void removeDirector(@PathVariable int id) {
         service.removeDirectorById(id);
     }
