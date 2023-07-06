@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
@@ -24,26 +22,17 @@ public class DirectorService {
      в противном случае бросаем ValidationException
      */
     public Director createDirector(Director director) {
-        if (validate(director).isPresent()) {
-            return storage.createDirector(director);
-        } else {
-            return null;
-        }
+        return storage.createDirector(director);
     }
 
     /*
      Обновляем уже лежащего у нас режиссера, если новый имеет корректные поля
      */
     public Director updateDirector(Director director) {
-        if (storage.getDirectorById(director.getId()).isPresent()) {
-            log.info("Режиссер с ID: {} обновлен", director.getId());
-            if (validate(director).isPresent()) {
-                return storage.updateDirector(validate(director).get());
-            }
-        } else {
-            throw new NotFoundException(String.format("Can not found director by ID : %d", director.getId()));
-        }
-        return null;
+        storage.getDirectorById(director.getId())
+                .orElseThrow(()
+                        -> new NotFoundException(String.format("Режиссер с ID: %d не найден", director.getId())));
+        return storage.updateDirector(director);
     }
 
     /*
@@ -80,23 +69,9 @@ public class DirectorService {
      Если есть в хранилище, то удаляем режиссера по ид
      */
     public void removeDirectorById(int id) {
-        if (storage.getDirectorById(id).isPresent()) {
-            storage.removeDirectorById(id);
-            log.info("Удалили режиссера с ID: {}", id);
-        } else {
-            throw new NotFoundException(String.format("Can not found director by ID: %d", id));
-        }
-    }
-
-    /*
-     Проверяем входящего режиссера на корректность полей
-    */
-    private Optional<Director> validate(@NotNull Director director) {
-        if (!director.getName().isEmpty() && !director.getName().isBlank()) {
-            return Optional.of(director);
-        } else {
-            log.error("Некорректное name режиссера: {}", director.getName());
-            throw new ValidationException("Illegal name from director");
-        }
+        storage.getDirectorById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Режиссер с ID: %d не найден", id)));
+        storage.removeDirectorById(id);
+        log.info("Удалили режиссера с ID: {}", id);
     }
 }
