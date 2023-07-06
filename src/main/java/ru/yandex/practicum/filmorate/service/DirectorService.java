@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,10 @@ import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__ (@Autowired))
 public class DirectorService {
 
     private final DirectorDbStorage storage;
-
-    @Autowired
-    public DirectorService(DirectorDbStorage storage) {
-        this.storage = storage;
-    }
 
     /*
      Добавляем нового режиссера, при условии, что он имеет корректные поля,

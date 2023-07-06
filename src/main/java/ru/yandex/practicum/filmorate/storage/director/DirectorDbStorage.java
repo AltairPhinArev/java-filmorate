@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.director;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,14 +15,10 @@ import java.util.*;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__ (@Autowired))
 public class DirectorDbStorage {  // Класс отвечающий за общение с хранилищем режиссеров
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     /*
      Добавляем нового режиссера в хранилище
