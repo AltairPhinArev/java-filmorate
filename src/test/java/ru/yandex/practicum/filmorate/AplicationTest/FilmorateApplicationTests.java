@@ -61,6 +61,7 @@ class FilmorateApplicationTests {
 				.voytedUsers(new HashSet<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 
 		Assertions.assertEquals(film1, filmService.createFilm(film1));
@@ -94,6 +95,7 @@ class FilmorateApplicationTests {
 				.voytedUsers(new HashSet<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 
 		Film film2 = Film.builder()
@@ -104,6 +106,7 @@ class FilmorateApplicationTests {
 				.duration(133)
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 
 		filmService.createFilm(film1);
@@ -123,6 +126,7 @@ class FilmorateApplicationTests {
 				.voytedUsers(new HashSet<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 
 		Film film2 = Film.builder()
@@ -133,6 +137,7 @@ class FilmorateApplicationTests {
 				.duration(133)
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 
 		filmService.createFilm(film1);
@@ -175,6 +180,7 @@ class FilmorateApplicationTests {
 				.voytedUsers(new HashSet<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
 				.build();
 		User user1 = User.builder()
 				.id(1L)
