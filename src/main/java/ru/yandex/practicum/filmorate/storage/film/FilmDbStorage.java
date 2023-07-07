@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,7 +26,8 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component("FilmDbStorage")
+@Component
+@Slf4j
 public class FilmDbStorage implements FilmStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -38,6 +38,7 @@ public class FilmDbStorage implements FilmStorage {
     DirectorDbStorage directorStorage;
 
     private static final Logger log = LogManager.getLogger(Film.class);
+
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService,
@@ -193,6 +194,15 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             log.info("Film with id " + filmId + " has been deleted");
         }
+    }
+
+    @Override
+    public boolean filmExists(long filmId) {
+        String checkSql = "SELECT COUNT(*) " +
+                "FROM films " +
+                "WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, filmId);
+        return count != null && count > 0;
     }
 }
 

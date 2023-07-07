@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 
 import ru.yandex.practicum.filmorate.service.DirectorService;
+
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.ReviewService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -23,6 +26,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest
@@ -30,13 +34,15 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @AutoConfigureCache
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class FilmorateApplicationTests {
+
 	private final UserDbStorage userStorage;
 	private final FilmDbStorage filmStorage;
 	private final FilmService filmService;
 	private final UserService userService;
-
 	private final DirectorService directorService;
+  private final ReviewService reviewService;
 
 	@Test
 	void testCreateUser() {
@@ -276,5 +282,50 @@ class FilmorateApplicationTests {
 		directorService.removeDirectorById(2);
 
 		Assertions.assertThrows(NotFoundException.class, () -> directorService.getDirectorById(2));
-	}
+	}  
+  
+    @Test
+    void updateReview_shouldReturnUpdatedReview() {
+        User user1 = User.builder()
+                .id(1L)
+                .name("login")
+                .login("login")
+                .email("login@mail.ru")
+                .birthday(LocalDate.of(1980, 12, 23))
+                .build();
+        userService.createUser(user1);
+        Film film1 = Film.builder()
+                .id(1L)
+                .name("Rocky")
+                .description("BOX")
+                .releaseDate(LocalDate.of(1975, 11, 19))
+                .duration(133)
+                .voytedUsers(new HashSet<>())
+                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+                .mpa(new MPA(4, "R"))
+                .build();
+        filmService.createFilm(film1);
+        Review review = Review.builder()
+                .reviewId(1L)
+                .content("Review text")
+                .isPositive(false)
+                .userId(user1.getId())
+                .filmId(film1.getId())
+                .useful(199)
+                .build();
+        reviewService.createReview(review);
+        assertEquals(reviewService.getReviewById(1L).getReviewId(), review.getReviewId());
+        Review updateReview = Review.builder()
+                .reviewId(1L)
+                .content("Review text updated")
+                .isPositive(true)
+                .userId(2L)
+                .filmId(2L)
+                .useful(10)
+                .build();
+        reviewService.updateReview(updateReview);
+        System.out.println(reviewService.getReviewById(1L).toString());
+        assertEquals(reviewService.getReviewById(1L).getUserId(), 1L);
+        assertEquals(reviewService.getReviewById(1L).getFilmId(), 1L);
+    }
 }

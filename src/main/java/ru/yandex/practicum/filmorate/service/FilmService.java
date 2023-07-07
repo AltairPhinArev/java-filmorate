@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +19,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@Slf4j
 public class FilmService {
 
     FilmStorage filmStorage;
@@ -30,11 +29,12 @@ public class FilmService {
 
     JdbcTemplate jdbcTemplate;
 
-    private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
+
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
                        JdbcTemplate jdbcTemplate, DirectorService directorService) {
+
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
