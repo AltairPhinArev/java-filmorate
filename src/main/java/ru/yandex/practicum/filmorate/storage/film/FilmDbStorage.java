@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,7 +25,8 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component("FilmDbStorage")
+@Component
+@Slf4j
 public class FilmDbStorage implements FilmStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -34,7 +34,6 @@ public class FilmDbStorage implements FilmStorage {
     GenreService genreService;
     LikeDbStorage likeDbStorage;
 
-    private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService,
@@ -49,16 +48,16 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
         return jdbcTemplate.query(sql, ((rs, rowNum) -> new Film(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getDate("release_date").toLocalDate(),
-                rs.getInt("duration"),
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getDate("release_date").toLocalDate(),
+                        rs.getInt("duration"),
                         new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))),
                         new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))),
                         new MPA(rs.getInt("rating_id"),
                                 mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-        )
+                )
         );
     }
 
@@ -91,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setGenres(film.getGenres().stream()
                     .sorted(Comparator.comparing(Genre::getId))
                     .collect(Collectors
-                            .toCollection(LinkedHashSet::new)));
+                    .toCollection(LinkedHashSet::new)));
             film.getGenres().stream()
                     .forEach(genre -> genreService.addGenreToFilm(film));
         }
@@ -99,7 +98,7 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-
+    @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, " + "rating_id = ? WHERE id = ?";
@@ -166,4 +165,14 @@ public class FilmDbStorage implements FilmStorage {
             log.info("Film with id " + filmId + " has been deleted");
         }
     }
+
+    @Override
+    public boolean filmExists(long filmId) {
+        String checkSql = "SELECT COUNT(*) " +
+                "FROM films " +
+                "WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, filmId);
+        return count != null && count > 0;
+    }
 }
+

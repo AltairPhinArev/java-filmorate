@@ -1,16 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.feed.Event;
-import ru.yandex.practicum.filmorate.storage.feed.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
@@ -19,21 +15,19 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@Slf4j
 public class FilmService {
 
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
-    HistoryService historyService;
     JdbcTemplate jdbcTemplate;
 
-    private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
-                       HistoryService historyService, JdbcTemplate jdbcTemplate) {
+    public FilmService(FilmStorage filmStorage, LikeDbStorage likeDbStorage,
+                       JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
-        this.historyService = historyService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -59,9 +53,12 @@ public class FilmService {
         filmStorage.deleteFilmById(id);
     }
 
+    public List<Film> commonFilms(Long userId, Long friendId) {
+        return likeDbStorage.findCommonFilms(userId, friendId);
+    }
+
     public void addLike(Long filmId, Long userId) {
         likeDbStorage.addLike(filmId, userId);
-        historyService.setOperation(userId, Event.LIKE, Operation.ADD, filmId);
     }
 
     public List<Film> getRateFilmsByCount(int count) {
@@ -74,7 +71,6 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
-        historyService.setOperation(userId, Event.LIKE, Operation.REMOVE, filmId);
     }
 
     private Film validate(Film film) {
