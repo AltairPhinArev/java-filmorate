@@ -282,8 +282,8 @@ class FilmorateApplicationTests {
 		directorService.removeDirectorById(2);
 
 		Assertions.assertThrows(NotFoundException.class, () -> directorService.getDirectorById(2));
-	}  
-  
+	}
+
     @Test
     void updateReview_shouldReturnUpdatedReview() {
         User user1 = User.builder()
