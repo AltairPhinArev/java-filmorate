@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder(toBuilder = true)
 public class Review {
     private Long reviewId;
