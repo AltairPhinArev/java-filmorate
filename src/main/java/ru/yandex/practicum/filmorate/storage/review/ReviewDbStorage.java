@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -84,10 +83,15 @@ public class ReviewDbStorage implements ReviewStorage {
             log.warn("Попытка обновить отзыв с id: {}. Отзыв не найден", updatedReview.getReviewId());
             throw new NotFoundException("Отзыв с указанным ID не найден: " + updatedReview.getReviewId());
         } else {
-            String sqlQuery = ReviewSqlQueries.GET_REVIEW_BY_ID;
-            Review updatedReviewInDb = jdbcTemplate.queryForObject(sqlQuery, reviewRowMapper, updatedReview.getReviewId());
-            log.info("Отзыв под id:{} обновлен", updatedReviewInDb.getReviewId());
-            return updatedReviewInDb;
+            try {
+                String sqlQuery = ReviewSqlQueries.GET_REVIEW_BY_ID;
+                Review updatedReviewInDb = jdbcTemplate.queryForObject(sqlQuery, reviewRowMapper, updatedReview.getReviewId());
+                log.info("Отзыв под id:{} обновлен", updatedReviewInDb.getReviewId());
+                return updatedReviewInDb;
+            } catch (EmptyResultDataAccessException ex) {
+                log.error("Произошла ошибка при получении обновленного отзыва по id: {}", updatedReview.getReviewId(), ex);
+                throw new NotFoundException("Обновленный отзыв с указанным ID не найден: " + updatedReview.getReviewId());
+            }
         }
     }
 
@@ -109,7 +113,6 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
-    @Cacheable("reviews")
     @Override
     public Optional<Review> getReviewById(Long reviewId) {
         try {
@@ -123,7 +126,6 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
-    @Cacheable("allReviews")
     @Override
     public List<Review> getAllReviews(Long filmId, int count) {
         String sql;

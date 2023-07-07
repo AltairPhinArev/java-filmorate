@@ -9,7 +9,9 @@ public class ReviewSqlQueries {
             "WHERE review_id =?;";
     public static final String REMOVE_REVIEW = "DELETE FROM reviews " +
             "WHERE review_id = ?";
-    public static final String GET_REVIEW_BY_ID = "SELECT * FROM reviews WHERE review_id = ?";
+    public static final String GET_REVIEW_BY_ID = "SELECT * " +
+            "FROM reviews " +
+            "WHERE review_id = ?";
 
     public static final String GET_ALL_REVIEWS = "SELECT * " +
             "FROM reviews " +
@@ -20,10 +22,12 @@ public class ReviewSqlQueries {
             "WHERE film_id = ? " +
             "ORDER BY useful_count DESC " +
             "LIMIT ?";
-    public static final String LIKE_REVIEW = "MERGE INTO review_reactions (user_id, review_id, reaction) " +
+    public static final String LIKE_REVIEW = "MERGE INTO review_reactions " +
+            "(user_id, review_id, reaction) " +
             "KEY (user_id, review_id) " +
             "VALUES (?, ?, 'LIKE')";
-    public static final String DISLIKE_REVIEW = "MERGE INTO review_reactions (user_id, review_id, reaction) " +
+    public static final String DISLIKE_REVIEW = "MERGE INTO review_reactions " +
+            "(user_id, review_id, reaction) " +
             "KEY (user_id, review_id) " +
             "VALUES (?, ?, 'DISLIKE')";
     public static final String REMOVE_LIKE = "DELETE FROM review_reactions " +
