@@ -26,7 +26,7 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("FilmDbStorage")
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
 
@@ -34,10 +34,7 @@ public class FilmDbStorage implements FilmStorage {
     MpaService mpaService;
     GenreService genreService;
     LikeDbStorage likeDbStorage;
-
     DirectorDbStorage directorStorage;
-
-    private static final Logger log = LogManager.getLogger(Film.class);
 
 
     @Autowired
