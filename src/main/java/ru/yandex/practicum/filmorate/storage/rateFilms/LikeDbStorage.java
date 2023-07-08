@@ -42,13 +42,6 @@ public class LikeDbStorage {
 
     public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {
 
-        String sql = "SELECT F.*, M.*, COUNT(FUR.FILM_ID) FROM FILM F LEFT " +
-                "JOIN FILM_USER_RATING FUR on F.FILM_ID = FUR.FILM_ID " +
-                "JOIN MPA M on M.MPA_ID = F.MPA_ID " +
-                "group by F.FILM_ID " +
-                "ORDER BY COUNT(FUR.FILM_ID) DESC " +
-                "LIMIT ?";
-
         String getPopularQuery = "SELECT id, name, description, release_date, duration, rating_id " +
                 "FROM films " +
                 "LEFT JOIN film_likes ON films.id = film_likes.film_id " +
@@ -70,25 +63,7 @@ public class LikeDbStorage {
 
         log.info("Top films by count {}, genreId {}, year {}", limit, genreId, year);
         params.add(limit);
-
-        return jdbcTemplate.query(
-                getPopularQuery,
-                params.toArray(),
-                (rs, rowNum) -> {
-                    Film film = Film.builder()
-                            .id(rs.getLong("id"))
-                            .name(rs.getString("name"))
-                            .description(rs.getString("description"))
-                            .releaseDate(rs.getDate("release_Date").toLocalDate())
-                            .duration(rs.getInt("duration"))
-                            .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
-                            .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
-                            .mpa(new MPA(rs.getInt("rating_id"),
-                                    mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-                            .directors(new HashSet<>())
-                            .build();
-                    return film;
-                });
+        return buildFilmFromQuery(getPopularQuery, params.toArray());
     }
 
 
@@ -100,26 +75,9 @@ public class LikeDbStorage {
                 "JOIN (SELECT film_id, COUNT(user_id) AS rate FROM film_likes GROUP BY film_id) " +
                 "AS fl ON fl.film_id = f.id " +
                 "ORDER BY fl.rate DESC";
-
-        return jdbcTemplate.query(
-                sqlQuery,
-                new Object[]{userId, friendId},
-                (rs, rowNum) -> {
-                    Film film = Film.builder()
-                            .id(rs.getLong("id"))
-                            .name(rs.getString("name"))
-                            .description(rs.getString("description"))
-                            .releaseDate(rs.getDate("release_Date").toLocalDate())
-                            .duration(rs.getInt("duration"))
-                            .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
-                            .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
-                            .mpa(new MPA(rs.getInt("rating_id"),
-                                    mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-                            .directors(new HashSet<>())
-                            .build();
-                    return film;
-                });
+        return buildFilmFromQuery(sqlQuery, new Object[]{userId, friendId});
     }
+
 
     public List<Long> getLikes(Long filmId) {
         String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
@@ -142,5 +100,25 @@ public class LikeDbStorage {
             e.getMessage();
             e.fillInStackTrace();
         }
+    }
+
+    private List<Film> buildFilmFromQuery(String sqlQuery, Object[] params) {
+        return jdbcTemplate.query(
+                sqlQuery,
+                params,
+                (rs, rowNum) -> {
+                    Film film = Film.builder()
+                            .id(rs.getLong("id"))
+                            .name(rs.getString("name"))
+                            .description(rs.getString("description"))
+                            .releaseDate(rs.getDate("release_Date").toLocalDate())
+                            .duration(rs.getInt("duration"))
+                            .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
+                            .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
+                            .mpa(new MPA(rs.getInt("rating_id"), mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
+                            .directors(new HashSet<>())
+                            .build();
+                    return film;
+                });
     }
 }
