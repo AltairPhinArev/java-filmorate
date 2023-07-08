@@ -32,21 +32,6 @@ public class Film {
 
     @Singular
     private Set<Director> directors;
-    private Director director;
-
-    @Builder
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration,
-                Set<Long> voytedUsers, Set<Genre> genres, MPA mpa) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.voytedUsers = voytedUsers;
-        this.genres = genres;
-        this.mpa = mpa;
-        director = null;
-    }
 
     ////////////////////////// Обновление коллекций //////////////////////////
 
@@ -59,11 +44,27 @@ public class Film {
         return true;
     }
 
+    public boolean isDirectorNew(long directorId) {
+        for (Director director : directors) {
+            if (director.getId() == directorId) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void addGenre(Genre genre) {
         if (genres == null) {
             genres = new HashSet<>();
         }
         genres.add(genre);
+    }
+
+    public void addDirector(Director director) {
+        if (directors == null) {
+            directors = new HashSet<>();
+        }
+        directors.add(director);
     }
 
     /////////////////////////////// Конвертация //////////////////////////////
@@ -102,10 +103,15 @@ public class Film {
             //добавляем его к фильму
             film.addGenre(genre);
         }
-        //подгружаем директора
-        Director director = new Director(rs.getInt("directors.id"),
-                rs.getString("directors.name"));
-        film.setDirector(director);
+        //подгружаем режиссеров
+        int directorId = rs.getInt("directors.id");
+        if ((directorId > 0) && (film.isDirectorNew(directorId))) { //он есть и новый
+            //создаем объект-режиссер
+            Director director = new Director(rs.getInt("directors.id"),
+                    rs.getString("directors.name"));
+            //добавляем его к фильму
+            film.addDirector(director);
+        }
         //пишем фильм в хранилище
         map.put(filmId, film);
     }

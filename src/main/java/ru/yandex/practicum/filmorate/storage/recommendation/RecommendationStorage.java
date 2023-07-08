@@ -9,9 +9,6 @@ public interface RecommendationStorage {
     //возвращает ближайшего по предпочтениям пользователя
     long getNearestUserId(long toId);
 
-    //возвращает всех ближайших по предпочтениям пользователей
-    List<Long> getNearestUserIds(long toId);
-
     //возвращает список фильмов, рекомендованных одним пользователем другому
     List<Film> recommendFilms(long fromId, long toId);
 }

@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.recommendation.RecommendationStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -37,23 +37,5 @@ public class RecommendationService {
         }
         //если все нормально - выводим рекомендации
         return recommendationStorage.recommendFilms(fromId, userId);
-    }
-
-    //возвращает рекомендации фильмов от нескольких человек для заданного пользователя
-    public List<Film> recommendBySeveralUsers(long userId) {
-        //вначале проверяем корректность userId
-        if (!userStorage.isUserPresent(userId)) { //пользователь не найден
-            log.error("NOT FOUNDED USER");
-            throw new NotFoundException("Пользователь с идентификатором " + userId + " не найден.");
-        }
-        //создаем множество фильмов
-        Set<Film> films = new HashSet<>();
-        //ищем пользователей, максимально пересекающихся с userId
-        List<Long> fromIds = recommendationStorage.getNearestUserIds(userId);
-        //выводим рекомендации
-        for (Long fromId : fromIds) {
-            films.addAll(recommendationStorage.recommendFilms(fromId, userId));
-        }
-        return films.stream().sorted(Comparator.comparingLong(Film::getId)).collect(Collectors.toList());
     }
 }
