@@ -18,7 +18,7 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 
-@Component("UserDbStorage")
+@Component
 public class UserDbStorage implements UserStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -94,11 +94,11 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
                 User user = new User(
-                resultSet.getLong("id"),
-                resultSet.getString("email"),
-                resultSet.getString("login"),
-                resultSet.getString("name"),
-                resultSet.getDate("birthday").toLocalDate()
+                        resultSet.getLong("id"),
+                        resultSet.getString("email"),
+                        resultSet.getString("login"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("birthday").toLocalDate()
                 );
                 return user;
             });
@@ -117,12 +117,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void deleteUserById(Long id) {
-        String sqlQuery = "DELETE FROM users";
+        String sqlQuery = "DELETE FROM users WHERE id = ?";
         if (getUserById(id) != null) {
-         jdbcTemplate.update(sqlQuery, id);
-         log.info("User has been deleted with ID={}", id);
+            jdbcTemplate.update(sqlQuery, id);
+            log.info("User has been deleted with ID={}", id);
         } else {
             throw new NotFoundException("NOT FOUND");
         }
+    }
+
+    public boolean userExists(Long userId) {
+        String sql = "SELECT COUNT(*) FROM users " +
+                "WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 }
