@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class FilmController {
@@ -64,6 +65,12 @@ public class FilmController {
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
         filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    public Set<Film> getFilmsByDirectorId(@PathVariable("directorId") int directorId,
+                                          @RequestParam(value = "sortBy", defaultValue = "likes") String sortedBy) {
+        return filmService.getFilmsByDirectorId(directorId, sortedBy);
     }
 
     @ExceptionHandler(NotFoundException.class)

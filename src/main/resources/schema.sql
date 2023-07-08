@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS `film_likes` CASCADE;
 DROP TABLE IF EXISTS `ratings_mpa` CASCADE;
+DROP TABLE IF EXISTS `directors` CASCADE;
+DROP TABLE IF EXISTS `film_directors` CASCADE;
 DROP TABLE IF EXISTS `genres` CASCADE ;
 DROP TABLE IF EXISTS `friends` CASCADE;
 DROP TABLE IF EXISTS `films` CASCADE;
@@ -25,6 +27,18 @@ CREATE TABLE IF NOT EXISTS films
     release_date date         NOT NULL,
     duration     int          NOT NULL,
     rating_id    int          NOT NULL REFERENCES ratings_mpa (id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS directors
+(
+    id int PRIMARY KEY,
+    name varchar(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS film_directors
+(
+    film_id int REFERENCES films (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    director_id int REFERENCES directors (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS genres
