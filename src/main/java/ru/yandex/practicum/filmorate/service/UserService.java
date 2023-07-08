@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -19,7 +18,7 @@ public class UserService {
     UserStorage userStorage;
     FriendDbStorage friendDbStorage;
 
-    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage, FriendDbStorage friendDbStorage) {
+    public UserService(UserStorage userStorage, FriendDbStorage friendDbStorage) {
         this.userStorage = userStorage;
         this.friendDbStorage = friendDbStorage;
     }
@@ -32,7 +31,7 @@ public class UserService {
 
     public User createUser(User user) {
         validate(user);
-       return userStorage.createUser(user);
+        return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
