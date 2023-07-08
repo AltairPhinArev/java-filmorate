@@ -11,7 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
+
+import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -33,204 +36,253 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class FilmorateApplicationTests {
-    private final UserDbStorage userStorage;
-    private final FilmDbStorage filmStorage;
-    private final FilmService filmService;
-    private final UserService userService;
-    private final ReviewService reviewService;
 
-    @Test
-    void testCreateUser() {
-        User user = User.builder()
-                .id(0L)
-                .name("ANtonY")
-                .login("technojew")
-                .birthday(LocalDate.of(1975, 11, 19))
-                .email("fositik@yandex.ru").build();
+	private final UserDbStorage userStorage;
+	private final FilmDbStorage filmStorage;
+	private final FilmService filmService;
+	private final UserService userService;
+	private final DirectorService directorService;
+  	private final ReviewService reviewService;
 
-        Assertions.assertEquals(user, userStorage.createUser(user));
-    }
+	@Test
+	void testCreateUser() {
+		User user = User.builder()
+				.id(0L)
+				.name("ANtonY")
+				.login("technojew")
+				.birthday(LocalDate.of(1975, 11, 19))
+				.email("fositik@yandex.ru").build();
 
-    @Test
-    public void testCreateFilm() {
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("Fighting club")
-                .description("2 = 1")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
+		Assertions.assertEquals(user,  userStorage.createUser(user));
+	}
 
-        Assertions.assertEquals(film1, filmService.createFilm(film1));
-    }
+	@Test
+	public void testCreateFilm() {
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Fighting club")
+				.description("2 = 1")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
 
-    @Test
-    public void testGetFilmById() {
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("Alisa")
-                .description("eat me")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
-        filmService.createFilm(film1);
-        Assertions.assertEquals(film1, filmService.getFilmById(film1.getId()));
-    }
+		Assertions.assertEquals(film1, filmService.createFilm(film1));
+	}
 
-    @Test
-    public void testGetAllFilms() {
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("Charly and Chocolate Fabric")
-                .description("Johny Depp")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
+	@Test
+	public void testGetFilmById() {
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Alisa")
+				.description("eat me")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
+		filmService.createFilm(film1);
+		Assertions.assertEquals(film1, filmService.getFilmById(film1.getId()));
+	}
 
-        Film film2 = Film.builder()
-                .id(2L)
-                .name("SuperFast")
-                .description("---")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
+	@Test
+	public void testGetAllFilms() {
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Charly and Chocolate Fabric")
+				.description("Johny Depp")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
 
-        filmService.createFilm(film1);
-        filmService.createFilm(film2);
+		Film film2 = Film.builder()
+				.id(2L)
+				.name("SuperFast")
+				.description("---")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
 
-        Assertions.assertEquals(2, filmService.findAll().size());
-    }
+		filmService.createFilm(film1);
+		filmService.createFilm(film2);
 
-    @Test
-    public void testRemoveFilmById() {
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("superFast 100")
-                .description("The last of last of last")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
+		Assertions.assertEquals(2, filmService.findAll().size());
+	}
 
-        Film film2 = Film.builder()
-                .id(2L)
-                .name("FightigngClub")
-                .description("")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
+	@Test
+	public void testRemoveFilmById() {
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("superFast 100")
+				.description("The last of last of last")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
 
-        filmService.createFilm(film1);
-        filmService.createFilm(film2);
+		Film film2 = Film.builder()
+				.id(2L)
+				.name("FightigngClub")
+				.description("")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
 
-        filmService.deleteFilmById(film1.getId());
-        assertThat(filmService.findAll().isEmpty());
+		filmService.createFilm(film1);
+		filmService.createFilm(film2);
 
-        Assertions.assertEquals(1, filmService.findAll().size());
-    }
+		filmService.deleteFilmById(film1.getId());
+		assertThat(filmService.findAll().isEmpty());
 
-    @Test
-    public void testFindUserById() {
-        User user1 = User.builder()
-                .id(4L)
-                .name("Dmitriy")
-                .login("FRIGH")
-                .email("Dmitriy@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 23))
-                .build();
-        userService.createUser(user1);
+		Assertions.assertEquals(1, filmService.findAll().size());
+	}
 
-        Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(user1.getId()));
+	@Test
+	public void testFindUserById() {
+		User user1 = User.builder()
+				.id(4L)
+				.name("Dmitriy")
+				.login("FRIGH")
+				.email("Dmitriy@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user1);
 
-        assertThat(userOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", user1.getId())
-                );
-    }
+		Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(user1.getId()));
 
-    @Test
-    public void testAddLike() {
-        Film film1 = Film.builder()
-                .id(1L)
-                .name("Rocky")
-                .description("BOX")
-                .releaseDate(LocalDate.of(1975, 11, 19))
-                .duration(133)
-                .voytedUsers(new HashSet<>())
-                .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
-                .mpa(new MPA(4, "R"))
-                .build();
-        User user1 = User.builder()
-                .id(1L)
-                .name("Dmitriy")
-                .login("FRIGH")
-                .email("Dmitriy@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 23))
-                .build();
+		assertThat(userOptional)
+				.isPresent()
+				.hasValueSatisfying(user ->
+						assertThat(user).hasFieldOrPropertyWithValue("id", user1.getId())
+				);
+	}
 
-        userStorage.createUser(user1);
-        filmStorage.createFilm(film1);
+	@Test
+	public void testAddLike() {
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Rocky")
+				.description("BOX")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.directors(Set.of())
+				.build();
+		User user1 = User.builder()
+				.id(1L)
+				.name("Dmitriy")
+				.login("FRIGH")
+				.email("Dmitriy@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
 
-        filmService.addLike(film1.getId(), user1.getId());
-        film1 = filmStorage.getFilmById(film1.getId());
+		userStorage.createUser(user1);
+		filmStorage.createFilm(film1);
 
-        assertThat(film1.getVoytedUsers()).contains(user1.getId());
-    }
+		filmService.addLike(film1.getId(), user1.getId());
+		film1 = filmStorage.getFilmById(film1.getId());
 
-    @Test
-    public void testGetCommonFriends() {
-        User user1 = User.builder()
-                .id(1L)
-                .name("login")
-                .login("login")
-                .email("login@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 23))
-                .build();
+		assertThat(film1.getVoytedUsers()).contains(user1.getId());
+	}
 
-        User user2 = User.builder()
-                .id(2L)
-                .name("login")
-                .login("login")
-                .email("login@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 24))
-                .build();
+	@Test
+	public void testGetCommonFriends() {
+		User user1 = User.builder()
+				.id(1L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
 
-        User user3 = User.builder()
-                .id(3L)
-                .name("login")
-                .login("login")
-                .email("anton@mail.ru")
-                .birthday(LocalDate.of(1980, 12, 25))
-                .build();
+		User user2 = User.builder()
+				.id(2L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 24))
+				.build();
 
-        user1 = userStorage.createUser(user1);
-        user2 = userStorage.createUser(user2);
-        user3 = userStorage.createUser(user3);
+		User user3 = User.builder()
+				.id(3L)
+				.name("login")
+				.login("login")
+				.email("anton@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 25))
+				.build();
 
-        userService.createFriend(user1.getId(), user2.getId());
-        userService.createFriend(user1.getId(), user3.getId());
-        userService.createFriend(user2.getId(), user1.getId());
-        userService.createFriend(user2.getId(), user3.getId());
-        assertThat(userService.findCommonFriends(user1.getId(), user2.getId())).hasSize(1);
-        assertThat(userService.findCommonFriends(user1.getId(), user2.getId()))
-                .contains(user3);
-    }
+		user1 = userStorage.createUser(user1);
+		user2 = userStorage.createUser(user2);
+		user3 = userStorage.createUser(user3);
+
+		userService.createFriend(user1.getId(), user2.getId());
+		userService.createFriend(user1.getId(), user3.getId());
+		userService.createFriend(user2.getId(), user1.getId());
+		userService.createFriend(user2.getId(), user3.getId());
+		assertThat(userService.findCommonFriends(user1.getId(), user2.getId())).hasSize(1);
+		assertThat(userService.findCommonFriends(user1.getId(), user2.getId()))
+				.contains(user3);
+	}
+
+	@Test
+	public void directorTests() {
+		Director director1 = new Director();
+		director1.setName("Director");
+
+		Director director2 = new Director();
+		director2.setName("Other Director");
+
+		Director directorToUpdate = new Director();
+		directorToUpdate.setId(1);
+		directorToUpdate.setName("Updated Director");
+
+		directorService.createDirector(director1);
+
+		assertThat(directorService.getDirectorById(1))
+				.isPresent()
+						.hasValueSatisfying(director -> assertThat(director)
+								.hasFieldOrPropertyWithValue("name", "Director"));
+
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 1);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(director1));
+
+		directorService.createDirector(director2);
+
+		Assertions.assertEquals(directorService.getDirectorById(2).get(), director2);
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(director2));
+
+		directorService.updateDirector(directorToUpdate);
+
+		Assertions.assertEquals(directorService.getDirectorById(1).get(), directorToUpdate);
+		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
+		Assertions.assertTrue(directorService.getDirectorSet().contains(directorToUpdate));
+		Assertions.assertFalse(directorService.getDirectorSet().contains(director1));
+
+		directorService.removeDirectorById(2);
+
+		Assertions.assertThrows(NotFoundException.class, () -> directorService.getDirectorById(2));
+	}
 
     @Test
     void updateReview_shouldReturnUpdatedReview() {

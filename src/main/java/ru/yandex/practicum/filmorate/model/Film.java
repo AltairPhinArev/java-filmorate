@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Data
+@Builder
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Film {
     private Long id;
 
@@ -22,14 +24,14 @@ public class Film {
 
     private Integer duration;
 
-    private Integer rate = 0;
-
     private Set<Genre> genres;
 
     private MPA mpa;
 
     private Set<Long> voytedUsers;
 
+    @Singular
+    private Set<Director> directors;
     private Director director;
 
     @Builder
