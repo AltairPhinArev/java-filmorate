@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class FilmService {
     FeedService feedService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, LikeDbStorage likeDbStorage,
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
                        JdbcTemplate jdbcTemplate, FeedService feedService) {
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;

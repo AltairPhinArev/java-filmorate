@@ -25,7 +25,7 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("FilmDbStorage")
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
 
