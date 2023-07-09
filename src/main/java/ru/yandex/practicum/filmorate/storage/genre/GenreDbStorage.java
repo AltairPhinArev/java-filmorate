@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class GenreDbStorage {
@@ -50,6 +51,8 @@ public class GenreDbStorage {
         String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         if (film.getGenres() != null) {
             film.getGenres().forEach(genre -> jdbcTemplate.update(sql, film.getId(), genre.getId()));
+        } else {
+            film.setGenres(Set.of());
         }
     }
 
