@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -21,13 +20,13 @@ public class UserService {
     UserStorage userStorage;
     FriendDbStorage friendDbStorage;
 
-    HistoryService historyService;
+    FeedService feedService;
 
-    public UserService(@Qualifier("UserDbStorage")UserStorage userStorage, FriendDbStorage friendDbStorage,
-                       HistoryService historyService) {
+    public UserService(UserStorage userStorage, FriendDbStorage friendDbStorage,
+                       FeedService feedService) {
         this.userStorage = userStorage;
         this.friendDbStorage = friendDbStorage;
-        this.historyService = historyService;
+        this.feedService = feedService;
     }
 
     private static final Logger log = LogManager.getLogger(User.class);
@@ -56,7 +55,7 @@ public class UserService {
 
     public void createFriend(Long userId, Long userFriendId) {
         friendDbStorage.createFriend(userId, userFriendId);
-        historyService.setOperation(userId, Event.FRIEND, Operation.ADD, userFriendId);
+        feedService.setOperation(userId, Event.FRIEND, Operation.ADD, userFriendId);
     }
 
     public List<User> findAllFriend(Long user) {
@@ -79,7 +78,7 @@ public class UserService {
 
     public void deleteFromFriends(Long userId, Long userFriendId) {
         friendDbStorage.deleteFromFriends(userId, userFriendId);
-        historyService.setOperation(userId, Event.FRIEND,Operation.REMOVE, userFriendId);
+        feedService.setOperation(userId, Event.FRIEND,Operation.REMOVE, userFriendId);
     }
 
     private User validate(User user) {

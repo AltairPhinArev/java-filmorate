@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS `reviews` CASCADE;
 DROP TABLE IF EXISTS `review_reactions` CASCADE;
 DROP INDEX IF EXISTS `review_reactions_user_id_index`;
 DROP INDEX IF EXISTS `review_reactions_review_id_index`;
+DROP TABLE IF EXISTS feeds CASCADE;
 
 CREATE TABLE IF NOT EXISTS ratings_mpa
 (
@@ -78,6 +79,16 @@ CREATE TABLE IF NOT EXISTS  review_reactions
     review_id   INTEGER  REFERENCES reviews (review_id) ON DELETE CASCADE,
     reaction    VARCHAR NOT NULL,
     PRIMARY KEY (user_id, review_id)
+);
+
+CREATE TABLE IF NOT EXISTS feeds
+(
+    feed_timestamp bigint,
+    user_id bigint REFERENCES users (id) ON DELETE CASCADE,
+    event_type varchar(255),
+    operation varchar(255),
+    eventId bigint generated always as identity primary key,
+    entityId bigint
 );
 
 CREATE INDEX review_reactions_user_id_index ON review_reactions (user_id);

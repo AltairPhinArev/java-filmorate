@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Feed;
@@ -10,12 +11,12 @@ import ru.yandex.practicum.filmorate.storage.feed.UserFeedDbStorage;
 import java.util.List;
 
 @Service
-public class HistoryService {
+public class FeedService {
 
     UserFeedDbStorage userFeedDbStorage;
 
     @Autowired
-    public HistoryService(UserFeedDbStorage userFeedDbStorage) {
+    public FeedService(UserFeedDbStorage userFeedDbStorage) {
         this.userFeedDbStorage = userFeedDbStorage;
     }
 

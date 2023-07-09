@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.HistoryService;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -17,12 +17,12 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
-    HistoryService historyService;
+    FeedService feedService;
 
     @Autowired
-    public UserController(UserService userService, HistoryService historyService) {
+    public UserController(UserService userService, FeedService feedService) {
         this.userService = userService;
-        this.historyService = historyService;
+        this.feedService = feedService;
     }
 
     @GetMapping(value = "/users")
@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping(value = "/users/{id}/feed")
     public List<Feed> getHistoryUserById(@PathVariable Long id) {
-        return historyService.getFeedByUserId(id);
+        return feedService.getFeedByUserId(id);
     }
 
     @PostMapping(value = "/users")

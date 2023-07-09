@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.storage.feed.Event;
 import ru.yandex.practicum.filmorate.storage.feed.Operation;
 
-@Data
+@Builder
 @AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Feed {
 
     Long timestamp;
