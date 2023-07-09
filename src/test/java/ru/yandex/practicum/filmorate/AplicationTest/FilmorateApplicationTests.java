@@ -319,7 +319,11 @@ class FilmorateApplicationTests {
                 .reviewId(1L)
                 .content("Review text updated")
                 .isPositive(true)
-                .userId(2L)
+                .userId(1L)
+				/*
+				userId таким образом лучше не менять так как истории юзера ссылается на существующего в
+                таблице юзера и при таком изменение вылетает DbException
+                */
                 .filmId(2L)
                 .useful(10)
                 .build();

@@ -26,7 +26,7 @@ public class UserFeedDbStorage {
     }
 
     public void setOperation(Long userId, Event event, Operation operation, Long entityId) {
-        String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, operation, entityId) " +
+        String sqlQuery = "INSERT INTO feeds (feed_timestamp, user_id, event_type, operation, entity_id) " +
                 "VALUES (?,?,?,?,?)";
 
         Long timestamp = Instant.now().toEpochMilli();

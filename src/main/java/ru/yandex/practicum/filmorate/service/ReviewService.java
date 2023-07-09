@@ -31,6 +31,7 @@ public class ReviewService {
 
     public Review updateReview(Review updatedReview) {
         validateReviewId(updatedReview.getReviewId());
+        validateUserId(updatedReview.getUserId());
         feedService.setOperation(updatedReview.getUserId(), Event.REVIEW, Operation.UPDATE,
                 updatedReview.getFilmId());
         return reviewStorage.updateReview(updatedReview);

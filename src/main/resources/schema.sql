@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS feeds
     user_id bigint REFERENCES users (id) ON DELETE CASCADE,
     event_type varchar(255),
     operation varchar(255),
-    eventId bigint generated always as identity primary key,
-    entityId bigint
+    event_id bigint generated always as identity primary key,
+    entity_id bigint
 );
 
 CREATE INDEX review_reactions_user_id_index ON review_reactions (user_id);
