@@ -30,9 +30,8 @@ public class UserFeedDbStorage {
                 "VALUES (?,?,?,?,?)";
 
         Long timestamp = Instant.now().toEpochMilli();
-        jdbcTemplate.update(sqlQuery, timestamp, userId, event.name(),
-                operation.name(), entityId);
-        log.info("Действе юзера с id{} были сохранены с данными " + event + " " + operation + entityId ,userId);
+        jdbcTemplate.update(sqlQuery, timestamp, userId, event.name(), operation.name(), entityId);
+        log.info("Действе юзера с id{} были сохранены с данными " + event + " " + operation + entityId, userId);
     }
 
     public List<Feed> getFeedByUserId(Long userId) {
