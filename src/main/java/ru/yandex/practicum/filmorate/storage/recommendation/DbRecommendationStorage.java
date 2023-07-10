@@ -36,7 +36,8 @@ public class DbRecommendationStorage implements RecommendationStorage {
 
     @Override
     public List<Film> recommendFilms(long fromId, long toId) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+                "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
                 "left join genres as g on fg.genre_id = g.id " +
