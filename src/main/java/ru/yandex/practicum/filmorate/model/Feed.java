@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import ru.yandex.practicum.filmorate.storage.feed.Event;
-import ru.yandex.practicum.filmorate.storage.feed.Operation;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 
 @Builder
 @AllArgsConstructor

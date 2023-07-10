@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.feed;
+package ru.yandex.practicum.filmorate.model.feedTypes;
 
 public enum Event {
     LIKE,

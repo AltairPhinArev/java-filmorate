@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.feed.Event;
-import ru.yandex.practicum.filmorate.storage.feed.Operation;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 

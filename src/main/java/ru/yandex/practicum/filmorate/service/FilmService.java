@@ -10,8 +10,8 @@ import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.feed.Event;
-import ru.yandex.practicum.filmorate.storage.feed.Operation;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
