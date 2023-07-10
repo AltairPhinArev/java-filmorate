@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
@@ -25,7 +27,7 @@ public class FilmService {
 
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
-
+    FeedService feedService;
     DirectorService directorService;
 
     JdbcTemplate jdbcTemplate;
@@ -34,12 +36,13 @@ public class FilmService {
     @Autowired
 
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
-                       JdbcTemplate jdbcTemplate, DirectorService directorService) {
+                       JdbcTemplate jdbcTemplate, DirectorService directorService, FeedService feedService) {
 
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
         this.directorService = directorService;
+        this.feedService = feedService;
     }
 
     public Collection<Film> findAll() {
@@ -70,6 +73,7 @@ public class FilmService {
 
     public void addLike(Long filmId, Long userId) {
         likeDbStorage.addLike(filmId, userId);
+        feedService.setOperation(userId, Event.LIKE, Operation.ADD, filmId);
     }
 
     public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {
@@ -83,6 +87,7 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
+        feedService.setOperation(userId, Event.LIKE, Operation.REMOVE, filmId);
     }
 
 
