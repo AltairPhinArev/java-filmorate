@@ -328,7 +328,7 @@ class FilmorateApplicationTests {
     }
 
 	@Test
-	public void testFeed_shouldReturnFeedUser () {
+	public void testFeed_shouldReturnFeedUser() {
 		User user1 = User.builder()
 				.id(1L)
 				.name("login")
@@ -361,7 +361,7 @@ class FilmorateApplicationTests {
 		Assertions.assertEquals(1, feedService.getFeedByUserId(user1.getId()).size());
 		Assertions.assertEquals(user1.getId(), feedService.getFeedByUserId(user1.getId()).get(0).getUserId());
 		Assertions.assertEquals(Operation.ADD, feedService.getFeedByUserId(user1.getId()).get(0).getOperation());
-		Assertions.assertEquals(Event.REVIEW , feedService.getFeedByUserId(user1.getId()).get(0).getEventType());
+		Assertions.assertEquals(Event.REVIEW, feedService.getFeedByUserId(user1.getId()).get(0).getEventType());
 		Assertions.assertEquals(user1, userService.getUserById(feedService.getFeedByUserId(user1.getId())
 				.get(0)
 				.getUserId()));
