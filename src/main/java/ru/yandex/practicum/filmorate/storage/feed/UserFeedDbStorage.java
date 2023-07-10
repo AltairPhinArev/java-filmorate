@@ -15,8 +15,8 @@ import java.util.List;
 @Component
 @Slf4j
 public class UserFeedDbStorage {
-    JdbcTemplate jdbcTemplate;
 
+    JdbcTemplate jdbcTemplate;
     UserStorage userStorage;
 
     @Autowired
@@ -39,13 +39,14 @@ public class UserFeedDbStorage {
 
         if (userStorage.getUserById(userId) != null) {
             log.info("Действе юзера с id{}", userId);
+
             return jdbcTemplate.query(sqlQuery, new Object[]{userId}, (rs, rowNum) -> new Feed(
                             rs.getLong("feed_timestamp"),
                             rs.getLong("user_id"),
                             Event.valueOf(rs.getString("event_type")),
                             Operation.valueOf(rs.getString("operation")),
-                            rs.getLong("eventId"),
-                            rs.getLong("entityId")
+                            rs.getLong("event_id"),
+                            rs.getLong("entity_id")
                     )
             );
         } else {

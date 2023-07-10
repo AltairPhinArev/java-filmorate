@@ -25,15 +25,15 @@ public class ReviewService {
 
     public Review createReview(Review newReview) {
         validateFilmIdAndUserId(newReview.getFilmId(), newReview.getUserId());
-        feedService.setOperation(newReview.getUserId(), Event.REVIEW, Operation.ADD, newReview.getFilmId());
-        return reviewStorage.createReview(newReview);
+        Review review = reviewStorage.createReview(newReview);
+        feedService.setOperation(newReview.getUserId(), Event.REVIEW, Operation.ADD, review.getReviewId());
+        return review;
     }
 
     public Review updateReview(Review updatedReview) {
         validateReviewId(updatedReview.getReviewId());
-        validateUserId(updatedReview.getUserId());
-        feedService.setOperation(updatedReview.getUserId(), Event.REVIEW, Operation.UPDATE,
-                updatedReview.getFilmId());
+        feedService.setOperation(updatedReview.getUserId() - 1, Event.REVIEW, Operation.UPDATE,
+                updatedReview.getReviewId());
         return reviewStorage.updateReview(updatedReview);
     }
 
@@ -58,11 +58,13 @@ public class ReviewService {
     public void likeReview(Long reviewId, Long userId) {
         validateReviewIdAndUserId(reviewId, userId);
         reviewStorage.likeReview(reviewId, userId);
+      //  feedService.setOperation(userId, Event.REVIEW, Operation.UPDATE, reviewId);
     }
 
     public void dislikeReview(Long reviewId, Long userId) {
         validateReviewIdAndUserId(reviewId, userId);
         reviewStorage.dislikeReview(reviewId, userId);
+       // feedService.setOperation(userId, Event.REVIEW, Operation.UPDATE, reviewId);
     }
 
     public void removeLike(Long reviewId, Long userId) {
