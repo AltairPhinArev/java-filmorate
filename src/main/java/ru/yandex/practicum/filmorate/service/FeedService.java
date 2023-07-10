@@ -29,7 +29,7 @@ public class FeedService {
 
     public List<Feed> getFeedByUserId(Long userId) {
         if (userStorage.getUserById(userId) == null) {
-            throw new NotFoundException("user with id ="+ userId + " Doesn't exist");
+            throw new NotFoundException("user with id =" + userId + " Doesn't exist");
         }
         return userFeedDbStorage.getFeedByUserId(userId);
     }
