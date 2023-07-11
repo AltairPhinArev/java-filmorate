@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
@@ -24,14 +25,17 @@ public class LikeDbStorage {
     JdbcTemplate jdbcTemplate;
     MpaService mpaService;
     GenreService genreService;
+    DirectorService directorService;
 
     private static final Logger log = LogManager.getLogger(Film.class);
 
     @Autowired
-    public LikeDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService) {
+    public LikeDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService,
+                         DirectorService directorService) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaService = mpaService;
         this.genreService = genreService;
+        this.directorService = directorService;
     }
 
     public void addLike(Long filmId, Long userId) {
@@ -116,7 +120,7 @@ public class LikeDbStorage {
                             .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
                             .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
                             .mpa(new MPA(rs.getInt("rating_id"), mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-                            .directors(new HashSet<>())
+                            .directors(new HashSet<>(directorService.getDirectorByFilmId(rs.getLong("id"))))
                             .build();
                     return film;
                 });

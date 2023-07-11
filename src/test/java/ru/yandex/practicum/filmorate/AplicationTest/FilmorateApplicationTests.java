@@ -367,4 +367,44 @@ class FilmorateApplicationTests {
 				.getUserId()));
 		Assertions.assertEquals(film1.getId(), feedService.getFeedByUserId(user1.getId()).get(0).getEntityId());
 	}
+
+	@Test
+	public void testCommonFilms() {
+		User user1 = User.builder()
+				.id(1L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user1);
+
+		User user2 = User.builder()
+				.id(2L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user2);
+		userService.createFriend(user1.getId(), user2.getId());
+		userService.createFriend(user2.getId(), user1.getId());
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Rocky")
+				.description("BOX")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.build();
+		filmService.createFilm(film1);
+		filmService.addLike(film1.getId(), user1.getId());
+		filmService.addLike(film1.getId(), user2.getId());
+
+		assertEquals(filmService.getFilmById(film1.getId()),
+				filmService.getFilmById(filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId()));
+		assertEquals(1, filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId());
+	}
 }

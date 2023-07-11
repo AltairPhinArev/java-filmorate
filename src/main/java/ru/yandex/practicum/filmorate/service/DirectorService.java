@@ -52,6 +52,10 @@ public class DirectorService {
         }
     }
 
+    public Set<Director> getDirectorByFilmId(Long filmId) {
+        return storage.getDirectorsByFilmId(filmId);
+    }
+
     /*
      Если нашли возвращаем режиссера по ID, если нет бросаем NotFoundException
     */
