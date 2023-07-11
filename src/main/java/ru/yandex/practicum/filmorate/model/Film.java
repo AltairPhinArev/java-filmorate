@@ -14,6 +14,7 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode
 public class Film {
+
     private Long id;
 
     private String name;
@@ -30,10 +31,18 @@ public class Film {
 
     private Set<Long> voytedUsers;
 
-    @Singular
     private Set<Director> directors;
 
     ////////////////////////// Обновление коллекций //////////////////////////
+
+    public boolean isLikeNew(long likeId) {
+        for (long like : voytedUsers) {
+            if (like == likeId) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public boolean isGenreNew(long genreId) {
         for (Genre genre : genres) {
@@ -45,12 +54,22 @@ public class Film {
     }
 
     public boolean isDirectorNew(long directorId) {
+        if (directors == null) {
+            directors = new HashSet<>();
+        }
         for (Director director : directors) {
             if (director.getId() == directorId) {
                 return false;
             }
         }
         return true;
+    }
+
+    public void addLike(long like) {
+        if (voytedUsers == null) {
+            voytedUsers = new HashSet<>();
+        }
+        voytedUsers.add(like);
     }
 
     public void addGenre(Genre genre) {
@@ -93,6 +112,14 @@ public class Film {
         } else { //он уже был
             film = map.get(filmId); //читаем его из map
         }
+        //сохраняем лайки
+        if (film.getVoytedUsers() == null) {
+            film.setVoytedUsers(new HashSet<>());
+        }
+        int likeId = rs.getInt("film_likes.user_id");
+        if ((likeId > 0) && (film.isLikeNew(likeId))) { //он есть и новый
+            film.addLike(likeId);
+        }
         //подгружаем имя рейтинга
         film.getMpa().setName(rs.getString("ratings_mpa.name"));
         //читаем из сводной таблицы жанр
@@ -104,11 +131,13 @@ public class Film {
             film.addGenre(genre);
         }
         //подгружаем режиссеров
+        if (film.getDirectors() == null) {
+            film.setDirectors(new HashSet<>());
+        }
         int directorId = rs.getInt("directors.id");
         if ((directorId > 0) && (film.isDirectorNew(directorId))) { //он есть и новый
             //создаем объект-режиссер
-            Director director = new Director(rs.getInt("directors.id"),
-                    rs.getString("directors.name"));
+            Director director = new Director(directorId, rs.getString("directors.name"));
             //добавляем его к фильму
             film.addDirector(director);
         }

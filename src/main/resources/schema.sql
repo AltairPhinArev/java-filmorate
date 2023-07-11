@@ -90,5 +90,5 @@ CREATE TABLE IF NOT EXISTS feeds
     entity_id bigint
 );
 
-CREATE INDEX review_reactions_user_id_index ON review_reactions (user_id);
-CREATE INDEX review_reactions_review_id_index ON review_reactions (review_id);
+CREATE INDEX IF NOT EXISTS review_reactions_user_id_index ON review_reactions (user_id);
+CREATE INDEX IF NOT EXISTS review_reactions_review_id_index ON review_reactions (review_id);
