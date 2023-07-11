@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -19,19 +21,26 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FeedService feedService;
 
     public Review createReview(Review newReview) {
         validateFilmIdAndUserId(newReview.getFilmId(), newReview.getUserId());
-        return reviewStorage.createReview(newReview);
+        Review review = reviewStorage.createReview(newReview);
+        feedService.setOperation(newReview.getUserId(), Event.REVIEW, Operation.ADD, review.getReviewId());
+        return review;
     }
 
     public Review updateReview(Review updatedReview) {
         validateReviewId(updatedReview.getReviewId());
+        feedService.setOperation(updatedReview.getUserId() - 1, Event.REVIEW, Operation.UPDATE,
+                updatedReview.getReviewId());
         return reviewStorage.updateReview(updatedReview);
     }
 
     public void removeReview(Long deletedReviewId) {
         validateReviewId(deletedReviewId);
+        feedService.setOperation(getReviewById(deletedReviewId).getUserId(),
+                Event.REVIEW, Operation.REMOVE, getReviewById(deletedReviewId).getFilmId());
         reviewStorage.removeReview(deletedReviewId);
     }
 
@@ -49,11 +58,13 @@ public class ReviewService {
     public void likeReview(Long reviewId, Long userId) {
         validateReviewIdAndUserId(reviewId, userId);
         reviewStorage.likeReview(reviewId, userId);
+      //  feedService.setOperation(userId, Event.REVIEW, Operation.UPDATE, reviewId);
     }
 
     public void dislikeReview(Long reviewId, Long userId) {
         validateReviewIdAndUserId(reviewId, userId);
         reviewStorage.dislikeReview(reviewId, userId);
+       // feedService.setOperation(userId, Event.REVIEW, Operation.UPDATE, reviewId);
     }
 
     public void removeLike(Long reviewId, Long userId) {
