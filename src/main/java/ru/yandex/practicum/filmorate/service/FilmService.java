@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
@@ -25,7 +27,7 @@ public class FilmService {
 
     FilmStorage filmStorage;
     LikeDbStorage likeDbStorage;
-
+    FeedService feedService;
     DirectorService directorService;
 
     JdbcTemplate jdbcTemplate;
@@ -34,12 +36,13 @@ public class FilmService {
     @Autowired
 
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, LikeDbStorage likeDbStorage,
-                       JdbcTemplate jdbcTemplate, DirectorService directorService) {
+                       JdbcTemplate jdbcTemplate, DirectorService directorService, FeedService feedService) {
 
         this.filmStorage = filmStorage;
         this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
         this.directorService = directorService;
+        this.feedService = feedService;
     }
 
     public Collection<Film> findAll() {
@@ -70,11 +73,13 @@ public class FilmService {
 
     public void addLike(Long filmId, Long userId) {
         likeDbStorage.addLike(filmId, userId);
+        feedService.setOperation(userId, Event.LIKE, Operation.ADD, filmId);
     }
 
-    public List<Film> getRateFilmsByCount(int count) {
-        return likeDbStorage.getRateFilmsByCount(count);
+    public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {
+        return likeDbStorage.getRateFilmsByCount(limit, genreId, year);
     }
+
 
     public List<Long> getLikes(Long filmId) {
         return likeDbStorage.getLikes(filmId);
@@ -82,6 +87,7 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         likeDbStorage.deleteLike(filmId, userId);
+        feedService.setOperation(userId, Event.LIKE, Operation.REMOVE, filmId);
     }
 
 
@@ -92,40 +98,39 @@ public class FilmService {
         if (!(sortBy.equals("likes")) && !(sortBy.equals("year"))) {
             throw new ValidationException("Можно сортировать только по годам или лайкам");
         }
-        Optional<Director> director = directorService.getDirectorById(directorId);
-        if (director.isPresent()) {
-            TreeSet<Film> comparingByYear = new TreeSet<>(
-                    Comparator.comparing(Film::getReleaseDate)
-            );
+        Director director = directorService.getDirectorById(directorId);
 
-            TreeSet<Film> comparingByLikes = new TreeSet<>(
-                    (o1, o2) -> {
-                        if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
-                            return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
-                        } else {
-                            return (int) (o1.getId() - o2.getId());
-                        }
-                    }
-            );
+        TreeSet<Film> comparingByYear = new TreeSet<>(
+            Comparator.comparing(Film::getReleaseDate)
+        );
 
-            List<Integer> filmsId = getFilmsIds(directorId);
-            Set<Film> films = new HashSet<>();
-            for (Integer integer : filmsId) {
-                films.add(getFilmById(((long) integer)));
+        TreeSet<Film> comparingByLikes = new TreeSet<>(
+            (o1, o2) -> {
+                if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
+                    return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
+                } else {
+                    return (int) (o1.getId() - o2.getId());
+                }
             }
+        );
 
-            switch (sortBy) {
-                case "year":
-                    comparingByYear.addAll(films);
-                    return comparingByYear;
-                case "likes":
-                    comparingByLikes.addAll(films);
-                    return comparingByLikes;
-                default:
-                    throw new NotFoundException("Не получилось собрать фильмы по режиссеру");
-            }
-        } else {
-            throw new NotFoundException(String.format("Не нашли режиссера с ID: %d", directorId));
+        List<Integer> filmsId = getFilmsIds(directorId);
+
+        Set<Film> films = new HashSet<>();
+
+        for (Integer integer : filmsId) {
+            films.add(getFilmById(((long) integer)));
+        }
+
+        switch (sortBy) {
+            case "year":
+                comparingByYear.addAll(films);
+                return comparingByYear;
+            case "likes":
+                comparingByLikes.addAll(films);
+                return comparingByLikes;
+            default:
+                throw new NotFoundException("Не получилось собрать фильмы по режиссеру");
         }
     }
 

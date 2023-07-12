@@ -14,12 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 
-import ru.yandex.practicum.filmorate.service.DirectorService;
-
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.ReviewService;
-import ru.yandex.practicum.filmorate.service.UserService;
-
+import ru.yandex.practicum.filmorate.service.*;
+import ru.yandex.practicum.filmorate.model.feedTypes.*;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -43,6 +39,8 @@ class FilmorateApplicationTests {
 	private final UserService userService;
 	private final DirectorService directorService;
   	private final ReviewService reviewService;
+	private final FeedService feedService;
+
 
 	@Test
 	void testCreateUser() {
@@ -258,23 +256,20 @@ class FilmorateApplicationTests {
 
 		directorService.createDirector(director1);
 
-		assertThat(directorService.getDirectorById(1))
-				.isPresent()
-						.hasValueSatisfying(director -> assertThat(director)
-								.hasFieldOrPropertyWithValue("name", "Director"));
+		assertThat(directorService.getDirectorById(1)).hasFieldOrPropertyWithValue("name", "Director");
 
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 1);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(director1));
 
 		directorService.createDirector(director2);
 
-		Assertions.assertEquals(directorService.getDirectorById(2).get(), director2);
+		Assertions.assertEquals(directorService.getDirectorById(2), director2);
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(director2));
 
 		directorService.updateDirector(directorToUpdate);
 
-		Assertions.assertEquals(directorService.getDirectorById(1).get(), directorToUpdate);
+		Assertions.assertEquals(directorService.getDirectorById(1), directorToUpdate);
 		Assertions.assertEquals(directorService.getDirectorSet().size(), 2);
 		Assertions.assertTrue(directorService.getDirectorSet().contains(directorToUpdate));
 		Assertions.assertFalse(directorService.getDirectorSet().contains(director1));
@@ -328,4 +323,85 @@ class FilmorateApplicationTests {
         assertEquals(reviewService.getReviewById(1L).getUserId(), 1L);
         assertEquals(reviewService.getReviewById(1L).getFilmId(), 1L);
     }
+
+	@Test
+	public void testFeed_shouldReturnFeedUser() {
+		User user1 = User.builder()
+				.id(1L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user1);
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Rocky")
+				.description("BOX")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.build();
+		filmService.createFilm(film1);
+		Review review = Review.builder()
+				.reviewId(1L)
+				.content("Review text")
+				.isPositive(false)
+				.userId(user1.getId())
+				.filmId(film1.getId())
+				.useful(199)
+				.build();
+		reviewService.createReview(review);
+
+		Assertions.assertEquals(1, feedService.getFeedByUserId(user1.getId()).size());
+		Assertions.assertEquals(user1.getId(), feedService.getFeedByUserId(user1.getId()).get(0).getUserId());
+		Assertions.assertEquals(Operation.ADD, feedService.getFeedByUserId(user1.getId()).get(0).getOperation());
+		Assertions.assertEquals(Event.REVIEW, feedService.getFeedByUserId(user1.getId()).get(0).getEventType());
+		Assertions.assertEquals(user1, userService.getUserById(feedService.getFeedByUserId(user1.getId())
+				.get(0)
+				.getUserId()));
+		Assertions.assertEquals(film1.getId(), feedService.getFeedByUserId(user1.getId()).get(0).getEntityId());
+	}
+
+	@Test
+	public void testCommonFilms() {
+		User user1 = User.builder()
+				.id(1L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user1);
+
+		User user2 = User.builder()
+				.id(2L)
+				.name("login")
+				.login("login")
+				.email("login@mail.ru")
+				.birthday(LocalDate.of(1980, 12, 23))
+				.build();
+		userService.createUser(user2);
+		userService.createFriend(user1.getId(), user2.getId());
+		userService.createFriend(user2.getId(), user1.getId());
+		Film film1 = Film.builder()
+				.id(1L)
+				.name("Rocky")
+				.description("BOX")
+				.releaseDate(LocalDate.of(1975, 11, 19))
+				.duration(133)
+				.voytedUsers(new HashSet<>())
+				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
+				.mpa(new MPA(4, "R"))
+				.build();
+		filmService.createFilm(film1);
+		filmService.addLike(film1.getId(), user1.getId());
+		filmService.addLike(film1.getId(), user2.getId());
+
+		assertEquals(filmService.getFilmById(film1.getId()),
+				filmService.getFilmById(filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId()));
+		assertEquals(1, filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId());
+	}
 }

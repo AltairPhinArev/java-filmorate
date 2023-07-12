@@ -44,12 +44,11 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review createReview(Review newReview) {
         try {
             newReview.setUseful(0);
-            String sql = ReviewSqlQueries.CREATE_REVIEW;
             KeyHolder keyHolder = new GeneratedKeyHolder();
             int rowsAffected = jdbcTemplate.update(
                     connection -> {
                         PreparedStatement prSt = connection.prepareStatement(
-                                sql, new String[]{"review_id"});
+                                ReviewSqlQueries.CREATE_REVIEW, new String[]{"review_id"});
                         prSt.setString(1, newReview.getContent());
                         prSt.setBoolean(2, newReview.getIsPositive());
                         prSt.setLong(3, newReview.getUserId());

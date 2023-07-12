@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @EqualsAndHashCode
 public class Director {
-    private int id;
+    private Integer id;
 
     @NotBlank
     private String name;
@@ -20,7 +20,7 @@ public class Director {
     }
 
     public Director(int id, String name) {
-        super();
+        this();
         this.id = id;
         this.name = name;
     }

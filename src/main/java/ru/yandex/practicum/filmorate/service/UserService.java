@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.feedTypes.Event;
+import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.friendShip.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -18,9 +20,13 @@ public class UserService {
     UserStorage userStorage;
     FriendDbStorage friendDbStorage;
 
-    public UserService(UserStorage userStorage, FriendDbStorage friendDbStorage) {
+    FeedService feedService;
+
+    public UserService(UserStorage userStorage, FriendDbStorage friendDbStorage,
+                       FeedService feedService) {
         this.userStorage = userStorage;
         this.friendDbStorage = friendDbStorage;
+        this.feedService = feedService;
     }
 
     private static final Logger log = LogManager.getLogger(User.class);
@@ -31,7 +37,7 @@ public class UserService {
 
     public User createUser(User user) {
         validate(user);
-        return userStorage.createUser(user);
+       return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
@@ -49,6 +55,7 @@ public class UserService {
 
     public void createFriend(Long userId, Long userFriendId) {
         friendDbStorage.createFriend(userId, userFriendId);
+        feedService.setOperation(userId, Event.FRIEND, Operation.ADD, userFriendId);
     }
 
     public List<User> findAllFriend(Long user) {
@@ -66,11 +73,12 @@ public class UserService {
             commonFriends = new HashSet<>(friendDbStorage.getFriends(firstUserId));
             commonFriends.retainAll(friendDbStorage.getFriends(secondUserId));
         }
-        return new ArrayList<User>(commonFriends);
+        return new ArrayList<>(commonFriends);
     }
 
-    public void deleteFromFriends(Long user, Long otherUser) {
-        friendDbStorage.deleteFromFriends(user, otherUser);
+    public void deleteFromFriends(Long userId, Long userFriendId) {
+        friendDbStorage.deleteFromFriends(userId, userFriendId);
+        feedService.setOperation(userId, Event.FRIEND,Operation.REMOVE, userFriendId);
     }
 
     private User validate(User user) {
