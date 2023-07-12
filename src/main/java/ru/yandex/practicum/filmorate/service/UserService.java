@@ -73,7 +73,7 @@ public class UserService {
             commonFriends = new HashSet<>(friendDbStorage.getFriends(firstUserId));
             commonFriends.retainAll(friendDbStorage.getFriends(secondUserId));
         }
-        return new ArrayList<User>(commonFriends);
+        return new ArrayList<>(commonFriends);
     }
 
     public void deleteFromFriends(Long userId, Long userFriendId) {
