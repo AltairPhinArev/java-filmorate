@@ -46,7 +46,7 @@ public class LikeDbStorage {
 
     public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {
 
-        String getPopularQuery = "SELECT id, name, description, release_date, duration, rating_id " +
+        String getPopularQuery = "SELECT films.* " +
                 "FROM films " +
                 "LEFT JOIN film_likes ON films.id = film_likes.film_id " +
                 "LEFT JOIN FILM_GENRES FG on FILMS.ID = FG.FILM_ID  ";
@@ -72,7 +72,7 @@ public class LikeDbStorage {
 
 
     public List<Film> findCommonFilms(Long userId, Long friendId) {
-        String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.rating_id " +
+        String sqlQuery = "SELECT f.* " +
                 "FROM films f " +
                 "JOIN film_likes fl1 ON fl1.film_id = f.id AND fl1.user_id = ? " +
                 "JOIN film_likes fl2 ON fl2.film_id = f.id AND fl2.user_id = ? " +

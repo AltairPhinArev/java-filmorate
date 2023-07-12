@@ -103,8 +103,8 @@ public class UserDbStorage implements UserStorage {
                 return user;
             });
         } catch (EmptyResultDataAccessException e) {
-            log.error("NOT FOUNDED USER");
-            throw new NotFoundException(e.getMessage());
+            log.error("User with id= " + id + "doesn't exist");
+            throw new NotFoundException("User with id= " + id + "doesn't exist");
         }
     }
 
@@ -122,7 +122,7 @@ public class UserDbStorage implements UserStorage {
             jdbcTemplate.update(sqlQuery, id);
             log.info("User has been deleted with ID={}", id);
         } else {
-            throw new NotFoundException("NOT FOUND");
+            throw new NotFoundException("User with id= " + id + "doesn't exist");
         }
     }
 
