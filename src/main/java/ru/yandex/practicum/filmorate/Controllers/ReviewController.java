@@ -50,7 +50,7 @@ public class ReviewController {
             //Этот параметр запроса не является обязательным
             @RequestParam(required = false) Long filmId,
             //Если count не указан, будет использовано значение 10
-            @RequestParam(defaultValue = "10") int count) {
+            @RequestParam(required = false, defaultValue = "10") int count) {
         return reviewService.getAllReviews(filmId, count);
     }
 

@@ -44,12 +44,11 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review createReview(Review newReview) {
         try {
             newReview.setUseful(0);
-            String sql = ReviewSqlQueries.CREATE_REVIEW;
             KeyHolder keyHolder = new GeneratedKeyHolder();
             int rowsAffected = jdbcTemplate.update(
                     connection -> {
                         PreparedStatement prSt = connection.prepareStatement(
-                                sql, new String[]{"review_id"});
+                                ReviewSqlQueries.CREATE_REVIEW, new String[]{"review_id"});
                         prSt.setString(1, newReview.getContent());
                         prSt.setBoolean(2, newReview.getIsPositive());
                         prSt.setLong(3, newReview.getUserId());
@@ -74,8 +73,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review updateReview(Review updatedReview) {
         log.info("Обновление отзыва под id:{}", updatedReview.getReviewId());
-        String sql = ReviewSqlQueries.UPDATE_REVIEW;
-        int affectedRows = jdbcTemplate.update(sql,
+        int affectedRows = jdbcTemplate.update(ReviewSqlQueries.UPDATE_REVIEW,
                 updatedReview.getContent(),
                 updatedReview.getIsPositive(),
                 updatedReview.getReviewId());
@@ -84,8 +82,8 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new NotFoundException("Отзыв с указанным ID не найден: " + updatedReview.getReviewId());
         } else {
             try {
-                String sqlQuery = ReviewSqlQueries.GET_REVIEW_BY_ID;
-                Review updatedReviewInDb = jdbcTemplate.queryForObject(sqlQuery, reviewRowMapper, updatedReview.getReviewId());
+                Review updatedReviewInDb = jdbcTemplate.queryForObject(ReviewSqlQueries.GET_REVIEW_BY_ID,
+                        reviewRowMapper, updatedReview.getReviewId());
                 log.info("Отзыв под id:{} обновлен", updatedReviewInDb.getReviewId());
                 return updatedReviewInDb;
             } catch (EmptyResultDataAccessException ex) {
@@ -98,8 +96,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public boolean removeReview(Long deletedReviewId) {
         try {
-            String sql = ReviewSqlQueries.REMOVE_REVIEW;
-            int rowsAffected = jdbcTemplate.update(sql, deletedReviewId);
+            int rowsAffected = jdbcTemplate.update(ReviewSqlQueries.REMOVE_REVIEW, deletedReviewId);
             if (rowsAffected > 0) {
                 log.info("Отзыв под id: {} удален", deletedReviewId);
                 return true;
@@ -116,10 +113,9 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Optional<Review> getReviewById(Long reviewId) {
         try {
-            String sql = ReviewSqlQueries.GET_REVIEW_BY_ID;
-            Review review = jdbcTemplate.queryForObject(sql, reviewRowMapper, reviewId);
+            Review review = jdbcTemplate.queryForObject(ReviewSqlQueries.GET_REVIEW_BY_ID, reviewRowMapper, reviewId);
             log.info("Отзыв под id:{} получен", reviewId);
-            return Optional.of(review);
+            return Optional.ofNullable(review);
         } catch (EmptyResultDataAccessException ex) {
             log.error("Произошла ошибка при получении отзыва по id: {}", reviewId, ex);
             return Optional.empty();
@@ -128,16 +124,14 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public List<Review> getAllReviews(Long filmId, int count) {
-        String sql;
         if (filmId == null) {
-            sql = ReviewSqlQueries.GET_ALL_REVIEWS;
-            List<Review> allReviewsWithoutFilmId = jdbcTemplate.query(sql, reviewRowMapper, count);
+            List<Review> allReviewsWithoutFilmId = jdbcTemplate.query(ReviewSqlQueries.GET_ALL_REVIEWS,
+                    reviewRowMapper, count);
             log.info("Получен список всех отзывов, независимо от идентификатора фильма");
             return allReviewsWithoutFilmId;
         } else {
-            sql = ReviewSqlQueries.GET_ALL_REVIEWS_BY_FILM_ID;
             log.info("Получен список всех отзывов, для фильма под id% {}", filmId);
-            return jdbcTemplate.query(sql, reviewRowMapper, filmId, count);
+            return jdbcTemplate.query(ReviewSqlQueries.GET_ALL_REVIEWS_BY_FILM_ID, reviewRowMapper, filmId, count);
         }
     }
 
@@ -145,8 +139,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void likeReview(Long reviewId, Long userId) {
         try {
-            String sql = ReviewSqlQueries.LIKE_REVIEW;
-            jdbcTemplate.update(sql, userId, reviewId);
+            jdbcTemplate.update(ReviewSqlQueries.LIKE_REVIEW, userId, reviewId);
             incrementUsefulCount(reviewId); //count+1
             log.info("Добавлен 'лайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
         } catch (DataAccessException ex) {
@@ -159,8 +152,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void dislikeReview(Long reviewId, Long userId) {
         try {
-            String sql = ReviewSqlQueries.DISLIKE_REVIEW;
-            jdbcTemplate.update(sql, userId, reviewId);
+            jdbcTemplate.update(ReviewSqlQueries.DISLIKE_REVIEW, userId, reviewId);
             decrementUsefulCount(reviewId); //count-1
             log.info("Добавлен 'дизлайк' от пользователя с id: {} к отзыву под id: {}", userId, reviewId);
         } catch (DataAccessException ex) {
@@ -173,8 +165,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void removeLike(Long reviewId, Long userId) {
         try {
-            String sql = ReviewSqlQueries.REMOVE_LIKE;
-            int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
+            int rowsAffected = jdbcTemplate.update(ReviewSqlQueries.REMOVE_LIKE, userId, reviewId);
             if (rowsAffected > 0) {
                 decrementUsefulCount(reviewId); //count-1
             }
@@ -189,8 +180,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public void removeDislike(Long reviewId, Long userId) {
         try {
-            String sql = ReviewSqlQueries.REMOVE_DISLIKE;
-            int rowsAffected = jdbcTemplate.update(sql, userId, reviewId);
+            int rowsAffected = jdbcTemplate.update(ReviewSqlQueries.REMOVE_DISLIKE, userId, reviewId);
             if (rowsAffected > 0) {
                 incrementUsefulCount(reviewId); //count+1
             }
@@ -202,18 +192,15 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     private void incrementUsefulCount(Long reviewId) {
-        String sql = ReviewSqlQueries.UPDATE_REVIEW_INCREMENT_USEFUL_COUNT;
-        jdbcTemplate.update(sql, reviewId);
+        jdbcTemplate.update(ReviewSqlQueries.UPDATE_REVIEW_INCREMENT_USEFUL_COUNT, reviewId);
     }
 
     private void decrementUsefulCount(Long reviewId) {
-        String sql = ReviewSqlQueries.UPDATE_REVIEW_DECREMENT_USEFUL_COUNT;
-        jdbcTemplate.update(sql, reviewId);
+        jdbcTemplate.update(ReviewSqlQueries.UPDATE_REVIEW_DECREMENT_USEFUL_COUNT, reviewId);
     }
 
     public boolean reviewExists(Long reviewId) {
-        String sql = ReviewSqlQueries.CHECK_REVIEW_EXIST;
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reviewId);
+        Integer count = jdbcTemplate.queryForObject(ReviewSqlQueries.CHECK_REVIEW_EXIST, Integer.class, reviewId);
         return count != null && count > 0;
     }
 }

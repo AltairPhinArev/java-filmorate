@@ -42,7 +42,6 @@ public class ReviewService {
     }
 
     public List<Review> getAllReviews(Long filmId, int count) {
-        log.warn("Фильм с id {} не найден", filmId);
         return reviewStorage.getAllReviews(filmId, count);
     }
 
