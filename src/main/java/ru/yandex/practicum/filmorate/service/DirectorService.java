@@ -59,22 +59,18 @@ public class DirectorService {
     /*
      Если нашли возвращаем режиссера по ID, если нет бросаем NotFoundException
     */
-    public Optional<Director> getDirectorById(int id) {
-        Optional<Director> director = storage.getDirectorById(id);
-        if (director.isPresent()) {
+    public Director getDirectorById(int id) {
+        Director director = storage.getDirectorById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Режиссер с ID: %d не найден", id)));
             log.info("Нашли и вернули режиссера с ID: {}", id);
             return director;
-        } else {
-            throw new NotFoundException(String.format("Режиссер с ID: %d не найден", id));
-        }
     }
 
     /*
      Если есть в хранилище, то удаляем режиссера по ид
      */
     public void removeDirectorById(int id) {
-        storage.getDirectorById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Режиссер с ID: %d не найден", id)));
+        getDirectorById(id);
         storage.removeDirectorById(id);
         log.info("Удалили режиссера с ID: {}", id);
     }
