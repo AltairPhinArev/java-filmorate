@@ -20,6 +20,10 @@ public class DbSearchStorage implements SearchStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private Comparator<Object> filmComparator = Comparator
+            .comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed();
+
+
     @Override
     public List<Film> searchFilmByName(String partialName) {
         String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
@@ -35,7 +39,7 @@ public class DbSearchStorage implements SearchStorage {
             Film.storeFullRow(rs, map);
         }, partialName);
         return map.values().stream()
-                .sorted(Comparator.comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed())
+                .sorted(filmComparator)
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +58,7 @@ public class DbSearchStorage implements SearchStorage {
             Film.storeFullRow(rs, map);
         }, partialName);
         return map.values().stream()
-                .sorted(Comparator.comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed())
+                .sorted(filmComparator)
                 .collect(Collectors.toList());
     }
 
@@ -73,7 +77,7 @@ public class DbSearchStorage implements SearchStorage {
             Film.storeFullRow(rs, map);
         }, partialName, partialName);
         return map.values().stream()
-                .sorted(Comparator.comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed())
+                .sorted(filmComparator)
                 .collect(Collectors.toList());
     }
 }
