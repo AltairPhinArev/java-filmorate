@@ -49,8 +49,7 @@ public class DbRecommendationStorage implements RecommendationStorage {
         jdbcTemplate.getJdbcTemplate().query(sqlQuery, (rs) -> {
             Film.storeFullRow(rs, map);
         }, fromId, toId);
-        return map.values()
-                .stream()
+        return map.values().stream()
                 .sorted(Comparator.comparingLong(Film::getId))
                 .collect(Collectors.toList());
     }
