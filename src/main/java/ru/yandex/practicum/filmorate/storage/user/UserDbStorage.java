@@ -16,8 +16,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 
-@Component("UserDbStorage")
+@Component
 public class UserDbStorage implements UserStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -93,28 +94,42 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sqlQuery, new Object[]{id}, (resultSet, rowNum) -> {
                 User user = new User(
-                resultSet.getLong("id"),
-                resultSet.getString("email"),
-                resultSet.getString("login"),
-                resultSet.getString("name"),
-                resultSet.getDate("birthday").toLocalDate()
+                        resultSet.getLong("id"),
+                        resultSet.getString("email"),
+                        resultSet.getString("login"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("birthday").toLocalDate()
                 );
                 return user;
             });
         } catch (EmptyResultDataAccessException e) {
-            log.error("NOT FOUNDED USER");
-            throw new NotFoundException(e.getMessage());
+            log.error("User with id= " + id + "doesn't exist");
+            throw new NotFoundException("User with id= " + id + "doesn't exist");
         }
     }
 
     @Override
+    public boolean isUserPresent(Long id) {
+        String sqlQuery = "SELECT count(*) as c FROM users WHERE id = ?";
+        List<Long> count = jdbcTemplate.query(sqlQuery, (r, n) -> r.getLong("c"), id);
+        return count.get(0) > 0;
+    }
+
+    @Override
     public void deleteUserById(Long id) {
-        String sqlQuery = "DELETE FROM users";
+        String sqlQuery = "DELETE FROM users WHERE id = ?";
         if (getUserById(id) != null) {
-         jdbcTemplate.update(sqlQuery, id);
-         log.info("User has been deleted with ID={}", id);
+            jdbcTemplate.update(sqlQuery, id);
+            log.info("User has been deleted with ID={}", id);
         } else {
-            throw new NotFoundException("NOT FOUND");
+            throw new NotFoundException("User with id= " + id + "doesn't exist");
         }
+    }
+
+    public boolean userExists(Long userId) {
+        String sql = "SELECT COUNT(*) FROM users " +
+                "WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count != null && count > 0;
     }
 }
