@@ -24,4 +24,5 @@ Application functionality:
 
 Diogram of Application and  Dependencies
 -
-![image](https://github.com/AltairPhinArev/java-filmorate/assets/113471380/a1ee1f7a-4467-4778-ae5f-45acc5498cb7)
+![image](https://github.com/AltairPhinArev/java-filmorate/assets/113471380/0207eaba-6a8c-4cd5-9bd3-0d1cd5b05773)
+
