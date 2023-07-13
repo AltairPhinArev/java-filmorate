@@ -71,8 +71,12 @@ public class FilmService {
         return likeDbStorage.findCommonFilms(userId, friendId);
     }
 
-    public void addLike(Long filmId, Long userId) {
-        likeDbStorage.addLike(filmId, userId);
+    public void addLike(Long filmId, Long userId, int points) {
+        if ((points < 1) || (points > 10)) {
+            log.error("Неверная оценка фильма: {}", points);
+            throw new ValidationException("Неверная оценка фильма: " + points);
+        }
+        likeDbStorage.addLike(filmId, userId, points);
         feedService.setOperation(userId, Event.LIKE, Operation.ADD, filmId);
     }
 
@@ -80,8 +84,7 @@ public class FilmService {
         return likeDbStorage.getRateFilmsByCount(limit, genreId, year);
     }
 
-
-    public List<Long> getLikes(Long filmId) {
+    public Map<Long,Integer> getLikes(Long filmId) {
         return likeDbStorage.getLikes(filmId);
     }
 
@@ -106,8 +109,8 @@ public class FilmService {
 
         TreeSet<Film> comparingByLikes = new TreeSet<>(
             (o1, o2) -> {
-                if (o1.getVoytedUsers().size() != o2.getVoytedUsers().size()) {
-                    return o1.getVoytedUsers().size() - o2.getVoytedUsers().size();
+                if (o1.getPoints().size() != o2.getPoints().size()) {
+                    return o1.getPoints().size() - o2.getPoints().size();
                 } else {
                     return (int) (o1.getId() - o2.getId());
                 }

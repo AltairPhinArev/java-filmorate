@@ -15,9 +15,7 @@ import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class LikeDbStorage {
@@ -38,9 +36,9 @@ public class LikeDbStorage {
         this.directorService = directorService;
     }
 
-    public void addLike(Long filmId, Long userId) {
-        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, filmId, userId);
+    public void addLike(Long filmId, Long userId, int points) {
+        String sql = "INSERT INTO film_likes (film_id, user_id, points) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, filmId, userId, points);
         log.info("you just liked film");
     }
 
@@ -63,7 +61,8 @@ public class LikeDbStorage {
             }
             params.add(year);
         }
-        getPopularQuery += "GROUP BY films.id ORDER BY COUNT(film_likes.user_id) DESC LIMIT ?";
+        //getPopularQuery += "GROUP BY films.id ORDER BY COUNT(film_likes.user_id) DESC LIMIT ?";
+        getPopularQuery += "GROUP BY films.id ORDER BY AVG(film_likes.points) DESC LIMIT ?";
 
         log.info("Top films by count {}, genreId {}, year {}", limit, genreId, year);
         params.add(limit);
@@ -82,11 +81,26 @@ public class LikeDbStorage {
         return buildFilmFromQuery(sqlQuery, new Object[]{userId, friendId});
     }
 
+    public double getRating(long filmId) {
+        String sql = "SELECT points FROM film_likes WHERE film_id = ?";
+        List<Integer> filmPoints= jdbcTemplate.query(sql, (rs, num) -> rs.getInt("points"), filmId);
+        if (filmPoints.size() == 0) { //нет ни одного лайка
+            return 1;
+        } else {
+            double sum = 0;
+            for (Integer point : filmPoints) {
+                sum += point;
+            }
+            return sum / filmPoints.size();
+        }
+    }
 
-    public List<Long> getLikes(Long filmId) {
-        String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                rs.getLong("user_id"), filmId);
+    public Map<Long,Integer> getLikes(Long filmId) {
+        String sql = "SELECT user_id, points FROM film_likes WHERE film_id = ?";
+        Map<Long,Integer> likes = new HashMap<>();
+        jdbcTemplate.query(sql, rs ->
+            {likes.put(rs.getLong("user_id"), rs.getInt("points"));}, filmId);
+        return likes;
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -117,7 +131,8 @@ public class LikeDbStorage {
                             .description(rs.getString("description"))
                             .releaseDate(rs.getDate("release_Date").toLocalDate())
                             .duration(rs.getInt("duration"))
-                            .voytedUsers(new HashSet<>(getLikes(rs.getLong("id"))))
+                            //.points(new HashSet<>(getLikes(rs.getLong("id"))))
+                            .points(getLikes(rs.getLong("id")))
                             .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
                             .mpa(new MPA(rs.getInt("rating_id"), mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
                             .directors(new HashSet<>(directorService.getDirectorByFilmId(rs.getLong("id"))))

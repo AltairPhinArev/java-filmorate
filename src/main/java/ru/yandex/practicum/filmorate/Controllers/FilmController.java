@@ -56,9 +56,9 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
-    @PutMapping(value = "/films/{id}/like/{userId}")
-    public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.addLike(id, userId);
+    @PutMapping(value = "/films/{id}/like/{userId}/points/{count}")
+    public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId, @PathVariable Integer count) {
+        filmService.addLike(id, userId, count);
     }
 
     @DeleteMapping(value = "/films/{id}")

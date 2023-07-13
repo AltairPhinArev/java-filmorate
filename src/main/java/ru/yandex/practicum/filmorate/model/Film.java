@@ -5,6 +5,7 @@ import lombok.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class Film {
 
     private Long id;
@@ -29,20 +31,11 @@ public class Film {
 
     private MPA mpa;
 
-    private Set<Long> voytedUsers;
+    private Map<Long, Integer> points;
 
     private Set<Director> directors;
 
     ////////////////////////// Обновление коллекций //////////////////////////
-
-    public boolean isLikeNew(long likeId) {
-        for (long like : voytedUsers) {
-            if (like == likeId) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public boolean isGenreNew(long genreId) {
         for (Genre genre : genres) {
@@ -63,13 +56,6 @@ public class Film {
             }
         }
         return true;
-    }
-
-    public void addLike(long like) {
-        if (voytedUsers == null) {
-            voytedUsers = new HashSet<>();
-        }
-        voytedUsers.add(like);
     }
 
     public void addGenre(Genre genre) {
@@ -112,13 +98,13 @@ public class Film {
         } else { //он уже был
             film = map.get(filmId); //читаем его из map
         }
-        //сохраняем лайки
-        if (film.getVoytedUsers() == null) {
-            film.setVoytedUsers(new HashSet<>());
+        //сохраняем оценки
+        if (film.getPoints() == null) {
+            film.setPoints(new HashMap<>());
         }
-        int likeId = rs.getInt("film_likes.user_id");
-        if ((likeId > 0) && (film.isLikeNew(likeId))) { //он есть и новый
-            film.addLike(likeId);
+        long userId = rs.getLong("film_likes.user_id");
+        if ((userId > 0) && (!film.getPoints().containsKey(userId))) { //лайк есть и новый
+            film.getPoints().put(userId, rs.getInt("film_likes.points"));
         }
         //подгружаем имя рейтинга
         film.getMpa().setName(rs.getString("ratings_mpa.name"));

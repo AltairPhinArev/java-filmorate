@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,19 +15,20 @@ import java.util.stream.Collectors;
 @Component
 public class DbSearchStorage implements SearchStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final LikeDbStorage likeDbStorage;
+    private Comparator<Object> filmComparator;
 
     @Autowired
-    public DbSearchStorage(JdbcTemplate jdbcTemplate) {
+    public DbSearchStorage(JdbcTemplate jdbcTemplate, LikeDbStorage likeDbStorage) {
+        this.likeDbStorage = likeDbStorage;
         this.jdbcTemplate = jdbcTemplate;
+        this.filmComparator = Comparator
+                .comparingDouble(f -> likeDbStorage.getRating(((Film) f).getId())).reversed();
     }
-
-    private Comparator<Object> filmComparator = Comparator
-            .comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed();
-
 
     @Override
     public List<Film> searchFilmByName(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
@@ -45,7 +47,7 @@ public class DbSearchStorage implements SearchStorage {
 
     @Override
     public List<Film> searchFilmByDirector(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
@@ -64,7 +66,7 @@ public class DbSearchStorage implements SearchStorage {
 
     @Override
     public List<Film> searchFilmByNameAndDirector(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +

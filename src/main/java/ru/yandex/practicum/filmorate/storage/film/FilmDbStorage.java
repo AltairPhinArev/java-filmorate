@@ -58,7 +58,8 @@ public class FilmDbStorage implements FilmStorage {
                                 .description(rs.getString("description"))
                                 .releaseDate(rs.getDate("release_Date").toLocalDate())
                                 .duration(rs.getInt("duration"))
-                                .voytedUsers(new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))))
+                                //.points(new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))))
+                                .points(likeDbStorage.getLikes(rs.getLong("id")))
                                 .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
                                 .mpa(new MPA(rs.getInt("rating_id"),
                                         mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
@@ -169,7 +170,8 @@ public class FilmDbStorage implements FilmStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_Date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
-                    .voytedUsers(new HashSet<>(likeDbStorage.getLikes(filmId)))
+                    //.points(new HashSet<>(likeDbStorage.getLikes(filmId)))
+                    .points(likeDbStorage.getLikes(filmId))
                     .genres(new HashSet<>(genreService.getGenresByFilmId(filmId)))
                     .mpa(new MPA(filmRows.getInt("rating_id"),
                             mpaService.getMpaRateById(filmRows.getInt("rating_id")).getName()))

@@ -45,7 +45,7 @@ public class FilmSearchTests {
         jdbcTemplate.update(TestUtils.getSqlForResetFilms(3, filmsIn));
         userService.createUser(new User(
                 1L, "a@bc", "aa", "xx", LocalDate.of(1970, 12, 1)));
-        filmService.addLike(3L, 1L);
+        filmService.addLike(3L, 1L, 6);
         List<Film> films = service.searchFilms("upDatE", "title,director");
         for (Film film : films) {
             System.out.println(film);

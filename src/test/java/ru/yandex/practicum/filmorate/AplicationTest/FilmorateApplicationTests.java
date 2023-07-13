@@ -62,7 +62,7 @@ class FilmorateApplicationTests {
 				.description("2 = 1")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.directors(Set.of())
@@ -79,7 +79,7 @@ class FilmorateApplicationTests {
 				.description("eat me")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.directors(Set.of())
@@ -96,7 +96,7 @@ class FilmorateApplicationTests {
 				.description("Johny Depp")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.directors(Set.of())
@@ -127,7 +127,7 @@ class FilmorateApplicationTests {
 				.description("The last of last of last")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.directors(Set.of())
@@ -181,7 +181,7 @@ class FilmorateApplicationTests {
 				.description("BOX")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.directors(Set.of())
@@ -197,10 +197,10 @@ class FilmorateApplicationTests {
 		userStorage.createUser(user1);
 		filmStorage.createFilm(film1);
 
-		filmService.addLike(film1.getId(), user1.getId());
+		filmService.addLike(film1.getId(), user1.getId(), 6);
 		film1 = filmStorage.getFilmById(film1.getId());
 
-		assertThat(film1.getVoytedUsers()).contains(user1.getId());
+		assertThat(film1.getPoints().containsKey(user1.getId()));
 	}
 
 	@Test
@@ -295,7 +295,7 @@ class FilmorateApplicationTests {
                 .description("BOX")
                 .releaseDate(LocalDate.of(1975, 11, 19))
                 .duration(133)
-                .voytedUsers(new HashSet<>())
+                .points(new HashMap<>())
                 .genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
                 .mpa(new MPA(4, "R"))
                 .build();
@@ -340,7 +340,7 @@ class FilmorateApplicationTests {
 				.description("BOX")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.build();
@@ -392,13 +392,13 @@ class FilmorateApplicationTests {
 				.description("BOX")
 				.releaseDate(LocalDate.of(1975, 11, 19))
 				.duration(133)
-				.voytedUsers(new HashSet<>())
+				.points(new HashMap<>())
 				.genres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))))
 				.mpa(new MPA(4, "R"))
 				.build();
 		filmService.createFilm(film1);
-		filmService.addLike(film1.getId(), user1.getId());
-		filmService.addLike(film1.getId(), user2.getId());
+		filmService.addLike(film1.getId(), user1.getId(), 6);
+		filmService.addLike(film1.getId(), user2.getId(), 7);
 
 		assertEquals(filmService.getFilmById(film1.getId()),
 				filmService.getFilmById(filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId()));
