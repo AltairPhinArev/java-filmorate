@@ -82,7 +82,7 @@ public class DbSearchStorage implements SearchStorage {
 
     private double getRating(long filmId) {
         String sql = "SELECT AVG(points) AS ap FROM film_likes WHERE film_id = ? GROUP BY film_id";
-        List<Double> filmPoints= jdbcTemplate.query(sql, (rs, num) -> rs.getDouble("ap"), filmId);
+        List<Double> filmPoints = jdbcTemplate.query(sql, (rs, num) -> rs.getDouble("ap"), filmId);
         return filmPoints.get(0);
     }
 }
