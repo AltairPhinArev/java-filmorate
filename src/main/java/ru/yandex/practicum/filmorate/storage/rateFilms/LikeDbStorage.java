@@ -84,8 +84,7 @@ public class LikeDbStorage {
     public Map<Long, Integer> getLikes(Long filmId) {
         String sql = "SELECT user_id, points FROM film_likes WHERE film_id = ?";
         Map<Long, Integer> likes = new HashMap<>();
-        jdbcTemplate.query(sql, rs ->
-        {
+        jdbcTemplate.query(sql, rs -> {
             likes.put(rs.getLong("user_id"), rs.getInt("points"));
         }, filmId);
         return likes;
