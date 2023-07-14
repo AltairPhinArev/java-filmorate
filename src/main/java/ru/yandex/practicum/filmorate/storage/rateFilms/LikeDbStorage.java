@@ -81,25 +81,13 @@ public class LikeDbStorage {
         return buildFilmFromQuery(sqlQuery, new Object[]{userId, friendId});
     }
 
-    public double getRating(long filmId) {
-        String sql = "SELECT points FROM film_likes WHERE film_id = ?";
-        List<Integer> filmPoints= jdbcTemplate.query(sql, (rs, num) -> rs.getInt("points"), filmId);
-        if (filmPoints.size() == 0) { //нет ни одного лайка
-            return 1;
-        } else {
-            double sum = 0;
-            for (Integer point : filmPoints) {
-                sum += point;
-            }
-            return sum / filmPoints.size();
-        }
-    }
-
-    public Map<Long,Integer> getLikes(Long filmId) {
+    public Map<Long, Integer> getLikes(Long filmId) {
         String sql = "SELECT user_id, points FROM film_likes WHERE film_id = ?";
-        Map<Long,Integer> likes = new HashMap<>();
+        Map<Long, Integer> likes = new HashMap<>();
         jdbcTemplate.query(sql, rs ->
-            {likes.put(rs.getLong("user_id"), rs.getInt("points"));}, filmId);
+        {
+            likes.put(rs.getLong("user_id"), rs.getInt("points"));
+        }, filmId);
         return likes;
     }
 
