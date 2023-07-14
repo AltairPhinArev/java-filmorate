@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RecommendationsTest {
     private static final int USER_COUNT = 10;
     private static final int FILM_COUNT = 10;
-    private final int GOOD_POINTS = 7;
-    private final int BAD_POINTS = 4;
+    private static final int GOOD_POINTS = 7;
+    private static final int BAD_POINTS = 4;
     private final RecommendationService recommendationService;
     private final FilmService filmService;
     private final JdbcTemplate jdbcTemplate;

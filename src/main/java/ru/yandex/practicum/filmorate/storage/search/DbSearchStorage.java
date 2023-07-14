@@ -5,10 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,7 +17,7 @@ public class DbSearchStorage implements SearchStorage {
     public DbSearchStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmComparator = Comparator
-                .comparingDouble(f -> getRating(((Film) f).getId())).reversed();
+                .comparingDouble(f -> getRating((Film) f)).reversed();
     }
 
     @Override
@@ -80,9 +77,15 @@ public class DbSearchStorage implements SearchStorage {
                 .collect(Collectors.toList());
     }
 
-    private double getRating(long filmId) {
-        String sql = "SELECT AVG(points) AS ap FROM film_likes WHERE film_id = ? GROUP BY film_id";
-        List<Double> filmPoints = jdbcTemplate.query(sql, (rs, num) -> rs.getDouble("ap"), filmId);
-        return filmPoints.get(0);
+    public double getRating(Film film) {
+        Collection<Integer> filmPoints = film.getPoints().values();
+        if (filmPoints.size() == 0) {
+            return 0;
+        }
+        double sum = 0;
+        for (Integer value : filmPoints) {
+            sum += value;
+        }
+        return sum / filmPoints.size();
     }
 }
