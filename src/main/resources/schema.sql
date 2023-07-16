@@ -52,7 +52,9 @@ CREATE TABLE IF NOT EXISTS film_likes
 (
     film_id  bigint REFERENCES films (id) ON DELETE CASCADE,
     user_id bigint REFERENCES users (id) ON DELETE CASCADE,
-    points int default 1
+    points int default 1,
+    CHECK (points BETWEEN 1 AND 10),
+    PRIMARY KEY (film_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS friends

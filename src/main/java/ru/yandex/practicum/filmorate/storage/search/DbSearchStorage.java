@@ -17,7 +17,7 @@ public class DbSearchStorage implements SearchStorage {
     public DbSearchStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmComparator = Comparator
-                .comparingDouble(f -> getRating((Film) f)).reversed();
+                .comparingDouble(f -> ((Film) f).getRating()).reversed();
     }
 
     @Override
@@ -75,17 +75,5 @@ public class DbSearchStorage implements SearchStorage {
         return map.values().stream()
                 .sorted(filmComparator)
                 .collect(Collectors.toList());
-    }
-
-    public double getRating(Film film) {
-        Collection<Integer> filmPoints = film.getPoints().values();
-        if (filmPoints.size() == 0) {
-            return 0;
-        }
-        double sum = 0;
-        for (Integer value : filmPoints) {
-            sum += value;
-        }
-        return sum / filmPoints.size();
     }
 }

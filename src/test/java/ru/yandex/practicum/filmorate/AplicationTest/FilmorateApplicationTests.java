@@ -197,7 +197,7 @@ class FilmorateApplicationTests {
 		userStorage.createUser(user1);
 		filmStorage.createFilm(film1);
 
-		filmService.addLike(film1.getId(), user1.getId(), 6);
+		filmService.addLike(film1.getId(), new LikeInputDao(user1.getId(), 6));
 		film1 = filmStorage.getFilmById(film1.getId());
 
 		assertThat(film1.getPoints().containsKey(user1.getId()));
@@ -397,8 +397,8 @@ class FilmorateApplicationTests {
 				.mpa(new MPA(4, "R"))
 				.build();
 		filmService.createFilm(film1);
-		filmService.addLike(film1.getId(), user1.getId(), 6);
-		filmService.addLike(film1.getId(), user2.getId(), 7);
+		filmService.addLike(film1.getId(), new LikeInputDao(user1.getId(), 6));
+		filmService.addLike(film1.getId(), new LikeInputDao(user2.getId(), 7));
 
 		assertEquals(filmService.getFilmById(film1.getId()),
 				filmService.getFilmById(filmService.commonFilms(user1.getId(), user2.getId()).get(0).getId()));

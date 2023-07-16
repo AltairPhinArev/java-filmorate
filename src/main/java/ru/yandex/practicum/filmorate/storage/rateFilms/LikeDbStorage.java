@@ -36,9 +36,9 @@ public class LikeDbStorage {
         this.directorService = directorService;
     }
 
-    public void addLike(Long filmId, Long userId, int points) {
-        String sql = "INSERT INTO film_likes (film_id, user_id, points) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, filmId, userId, points);
+    public void addLike(Long filmId, Long userId, int mark) {
+        String sql = "MERGE INTO film_likes (film_id, user_id, points) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, filmId, userId, mark);
         log.info("you just liked film");
     }
 
@@ -61,7 +61,6 @@ public class LikeDbStorage {
             }
             params.add(year);
         }
-        //getPopularQuery += "GROUP BY films.id ORDER BY COUNT(film_likes.user_id) DESC LIMIT ?";
         getPopularQuery += "GROUP BY films.id ORDER BY AVG(film_likes.points) DESC LIMIT ?";
 
         log.info("Top films by count {}, genreId {}, year {}", limit, genreId, year);
@@ -81,13 +80,13 @@ public class LikeDbStorage {
         return buildFilmFromQuery(sqlQuery, new Object[]{userId, friendId});
     }
 
-    public Map<Long, Integer> getLikes(Long filmId) {
+    public Map<Long, Integer> getPoints(Long filmId) {
         String sql = "SELECT user_id, points FROM film_likes WHERE film_id = ?";
-        Map<Long, Integer> likes = new HashMap<>();
+        Map<Long, Integer> points = new HashMap<>();
         jdbcTemplate.query(sql, rs -> {
-            likes.put(rs.getLong("user_id"), rs.getInt("points"));
+            points.put(rs.getLong("user_id"), rs.getInt("points"));
         }, filmId);
-        return likes;
+        return points;
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -118,8 +117,7 @@ public class LikeDbStorage {
                             .description(rs.getString("description"))
                             .releaseDate(rs.getDate("release_Date").toLocalDate())
                             .duration(rs.getInt("duration"))
-                            //.points(new HashSet<>(getLikes(rs.getLong("id"))))
-                            .points(getLikes(rs.getLong("id")))
+                            .points(getPoints(rs.getLong("id")))
                             .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
                             .mpa(new MPA(rs.getInt("rating_id"), mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
                             .directors(new HashSet<>(directorService.getDirectorByFilmId(rs.getLong("id"))))

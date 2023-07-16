@@ -5,10 +5,7 @@ import lombok.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Getter
@@ -70,6 +67,11 @@ public class Film {
             directors = new HashSet<>();
         }
         directors.add(director);
+    }
+
+    public double getRating() {
+        int sum = points.values().stream().reduce(0, Integer::sum);
+        return sum == 0 ? 0.d : ((double) sum) / points.size();
     }
 
     /////////////////////////////// Конвертация //////////////////////////////
