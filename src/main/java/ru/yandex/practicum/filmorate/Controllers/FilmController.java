@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.LikeInputDao;
+import ru.yandex.practicum.filmorate.model.LikeInputDto;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -58,8 +58,8 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films/{id}")
-    public void addLikeToFilm(@PathVariable Long id, @RequestBody LikeInputDao likeInputDao) {
-        filmService.addLike(id, likeInputDao);
+    public void addLikeToFilm(@PathVariable Long id, @RequestBody LikeInputDto likeInputDto) {
+        filmService.addLike(id, likeInputDto);
     }
 
     @DeleteMapping(value = "/films/{id}")

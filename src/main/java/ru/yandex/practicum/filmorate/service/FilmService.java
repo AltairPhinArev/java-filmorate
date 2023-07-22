@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.LikeInputDao;
+import ru.yandex.practicum.filmorate.model.LikeInputDto;
 import ru.yandex.practicum.filmorate.model.feedTypes.Event;
 import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -72,13 +72,13 @@ public class FilmService {
         return likeDbStorage.findCommonFilms(userId, friendId);
     }
 
-    public void addLike(Long filmId, LikeInputDao likeInputDao) {
-        likeDbStorage.addLike(filmId, likeInputDao.getUserId(), likeInputDao.getMark());
-        feedService.setOperation(likeInputDao.getUserId(), Event.LIKE, Operation.ADD, filmId);
+    public void addLike(Long filmId, LikeInputDto likeInputDto) {
+        likeDbStorage.addLike(filmId, likeInputDto.getUserId(), likeInputDto.getMark());
+        feedService.setOperation(likeInputDto.getUserId(), Event.LIKE, Operation.ADD, filmId);
     }
 
     public void addLike(Long filmId, long userId, int mark) {
-        addLike(filmId, new LikeInputDao(userId, mark));
+        addLike(filmId, new LikeInputDto(userId, mark));
     }
 
     public List<Film> getRateFilmsByCount(int limit, Integer genreId, Integer year) {

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LikeInputDao {
+public class LikeInputDto {
     long userId;
     int mark;
 }
