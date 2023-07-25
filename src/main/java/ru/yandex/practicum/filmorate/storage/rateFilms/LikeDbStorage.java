@@ -22,7 +22,7 @@ public class LikeDbStorage extends AbstractLikeStorage {
     }
 
     public void addLike(Long filmId, Long userId) {
-        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+        String sql = "MERGE INTO film_likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
         log.info("you just liked film");
     }
