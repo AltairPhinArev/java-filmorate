@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.LikeInputDto;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -41,7 +39,6 @@ public class FilmController {
         return filmService.getRateFilmsByCount(limit, genreId, year);
     }
 
-
     @GetMapping(value = "/films/common")
     public List<Film> commonFilms(@RequestParam("userId") Long userId, @RequestParam("friendId") Long friendId) {
         return filmService.commonFilms(userId, friendId);
@@ -57,9 +54,9 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
-    @PutMapping(value = "/films/{id}")
-    public void addLikeToFilm(@PathVariable Long id, @RequestBody LikeInputDto likeInputDto) {
-        filmService.addLike(id, likeInputDto);
+    @PutMapping(value = "/films/{id}/like/{userId}")
+    public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.addLike(id, userId);
     }
 
     @DeleteMapping(value = "/films/{id}")

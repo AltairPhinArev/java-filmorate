@@ -7,9 +7,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.LikeInputDto;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.SearchService;
+import ru.yandex.practicum.filmorate.service.FilmMarkService;
+import ru.yandex.practicum.filmorate.service.SearchMarkService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
@@ -21,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmSearchTests {
-    private final SearchService service;
-    private final FilmService filmService;
+    private final SearchMarkService service;
+    private final FilmMarkService filmService;
     private final UserService userService;
     private final JdbcTemplate jdbcTemplate;
 
@@ -45,7 +46,7 @@ public class FilmSearchTests {
         jdbcTemplate.update(TestUtils.getSqlForResetFilms(3, filmsIn));
         userService.createUser(new User(
                 1L, "a@bc", "aa", "xx", LocalDate.of(1970, 12, 1)));
-        filmService.addLike(3L, 1L, 6);
+        filmService.addMark(3L, new LikeInputDto(1L, 6));
         List<Film> films = service.searchFilms("upDatE", "title,director");
         for (Film film : films) {
             System.out.println(film);
