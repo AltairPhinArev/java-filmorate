@@ -11,22 +11,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component("DbSearchStorage")
-public class DbSearchStorage implements SearchStorage {
+@Component("DbMarkSearchStorage")
+public class DbMarkSearchStorage implements SearchStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final Comparator<Object> filmComparator;
 
     @Autowired
-    public DbSearchStorage(JdbcTemplate jdbcTemplate) {
+    public DbMarkSearchStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmComparator = Comparator
+                .comparingDouble(f -> ((Film) f).calcRating()).reversed();
     }
-
-    private final Comparator<Object> filmComparator = Comparator
-            .comparingInt(f -> ((Film) f).getVoytedUsers().size()).reversed();
-
 
     @Override
     public List<Film> searchFilmByName(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
@@ -36,7 +35,7 @@ public class DbSearchStorage implements SearchStorage {
                 "where lower(f.name) like concat('%',lower(?),'%') ";
         Map<Long, Film> map = new HashMap<>();
         jdbcTemplate.query(sqlQuery, (rs) -> {
-            Film.storeFullRow(rs, map);
+            Film.storeFullRowWithMarks(rs, map);
         }, partialName);
         return map.values().stream()
                 .sorted(filmComparator)
@@ -45,7 +44,7 @@ public class DbSearchStorage implements SearchStorage {
 
     @Override
     public List<Film> searchFilmByDirector(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
@@ -55,7 +54,7 @@ public class DbSearchStorage implements SearchStorage {
                 "where lower(d.name) like concat('%',lower(?),'%')";
         Map<Long, Film> map = new HashMap<>();
         jdbcTemplate.query(sqlQuery, (rs) -> {
-            Film.storeFullRow(rs, map);
+            Film.storeFullRowWithMarks(rs, map);
         }, partialName);
         return map.values().stream()
                 .sorted(filmComparator)
@@ -64,7 +63,7 @@ public class DbSearchStorage implements SearchStorage {
 
     @Override
     public List<Film> searchFilmByNameAndDirector(String partialName) {
-        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id from films as f " +
+        String sqlQuery = "select f.*, d.*, g.id, g.name, m.name, l.user_id, l.points from films as f " +
                 "left join film_likes as l on f.id = l.film_id " +
                 "left join ratings_mpa as m on f.rating_id = m.id " +
                 "left join film_genres as fg on fg.film_id = f.id " +
@@ -74,7 +73,7 @@ public class DbSearchStorage implements SearchStorage {
                 "where lower(f.name) like concat('%',lower(?),'%') or lower(d.name) like concat('%',lower(?),'%')";
         Map<Long, Film> map = new HashMap<>();
         jdbcTemplate.query(sqlQuery, (rs) -> {
-            Film.storeFullRow(rs, map);
+            Film.storeFullRowWithMarks(rs, map);
         }, partialName, partialName);
         return map.values().stream()
                 .sorted(filmComparator)

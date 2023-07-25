@@ -5,14 +5,13 @@ import lombok.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class Film {
 
     private Long id;
@@ -29,20 +28,12 @@ public class Film {
 
     private MPA mpa;
 
-    private Set<Long> voytedUsers;
+    private Map<Long, Integer> points;
 
     private Set<Director> directors;
 
-    ////////////////////////// Обновление коллекций //////////////////////////
 
-    public boolean isLikeNew(long likeId) {
-        for (long like : voytedUsers) {
-            if (like == likeId) {
-                return false;
-            }
-        }
-        return true;
-    }
+    ////////////////////////// Обновление коллекций //////////////////////////
 
     public boolean isGenreNew(long genreId) {
         for (Genre genre : genres) {
@@ -65,13 +56,6 @@ public class Film {
         return true;
     }
 
-    public void addLike(long like) {
-        if (voytedUsers == null) {
-            voytedUsers = new HashSet<>();
-        }
-        voytedUsers.add(like);
-    }
-
     public void addGenre(Genre genre) {
         if (genres == null) {
             genres = new HashSet<>();
@@ -84,6 +68,11 @@ public class Film {
             directors = new HashSet<>();
         }
         directors.add(director);
+    }
+
+    public double calcRating() {
+        int sum = points.values().stream().reduce(0, Integer::sum);
+        return sum == 0 ? 0.d : ((double) sum) / points.size();
     }
 
     /////////////////////////////// Конвертация //////////////////////////////
@@ -100,6 +89,87 @@ public class Film {
                 .build();
         film.setGenres(new HashSet<>());
         return film;
+    }
+
+    //распаковка строки со всеми связями в фильм
+    public static void storeFullRowWithMarks(ResultSet rs, Map<Long, Film> map) throws SQLException {
+        Film film;
+        //читаем идентификатор
+        long filmId = rs.getLong("films.id");
+        if (!map.containsKey(filmId)) { //фильма еще не было в map
+            film = mapRowToFilm(rs, 0); //создаем его из набора
+        } else { //он уже был
+            film = map.get(filmId); //читаем его из map
+        }
+        //сохраняем оценки
+        if (film.getPoints() == null) {
+            film.setPoints(new HashMap<>());
+        }
+        long userId = rs.getLong("film_likes.user_id");
+        if ((userId > 0) && (!film.getPoints().containsKey(userId))) { //лайк есть и новый
+            film.getPoints().put(userId, rs.getInt("film_likes.points"));
+        }
+        //подгружаем имя рейтинга
+        film.getMpa().setName(rs.getString("ratings_mpa.name"));
+        //читаем из сводной таблицы жанр
+        int genreId = rs.getInt("genres.id");
+        if ((genreId > 0) && (film.isGenreNew(genreId))) { //он есть и новый
+            //создаем объект-жанр
+            Genre genre = new Genre(genreId, rs.getString("genres.name"));
+            //добавляем его к фильму
+            film.addGenre(genre);
+        }
+        //подгружаем режиссеров
+        if (film.getDirectors() == null) {
+            film.setDirectors(new HashSet<>());
+        }
+        int directorId = rs.getInt("directors.id");
+        if ((directorId > 0) && (film.isDirectorNew(directorId))) { //он есть и новый
+            //создаем объект-режиссер
+            Director director = new Director(directorId, rs.getString("directors.name"));
+            //добавляем его к фильму
+            film.addDirector(director);
+        }
+        //пишем фильм в хранилище
+        map.put(filmId, film);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    ///////////////////// Методы обратной совместимости //////////////////////
+    //////////////////////////////////////////////////////////////////////////
+
+    public Set<Long> getVoytedUsers() {
+        if (points == null) {
+            points = new HashMap<>();
+        }
+        return points.keySet();
+    }
+
+    public void setVoytedUsers(Set<Long> likes) {
+        if (points == null) {
+            points = new HashMap<>();
+        } else {
+            points.clear();
+        }
+        for (Long like : likes) {
+            points.put(like, 1); //оценка-заглушка
+        }
+    }
+
+    public boolean isLikeNew(long likeId) {
+        for (long like : getVoytedUsers()) {
+            if (like == likeId) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void addLike(long like) {
+        if (points == null) {
+            points = new HashMap<>();
+        }
+        points.put(like, null);
     }
 
     //распаковка строки со всеми связями в фильм

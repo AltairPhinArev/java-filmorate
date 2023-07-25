@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.feedTypes.Event;
 import ru.yandex.practicum.filmorate.model.feedTypes.Operation;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ReviewService {
     private final ReviewStorage reviewStorage;
-    private final FilmStorage filmStorage;
+    private final ru.yandex.practicum.filmorate.storage.film.FilmDbStorage filmStorage;
     private final UserStorage userStorage;
     private final FeedService feedService;
 

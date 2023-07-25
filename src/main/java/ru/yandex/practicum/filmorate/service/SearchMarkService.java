@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.storage.search.SearchStorage;
 
 @Service
-public class SearchService extends AbstractSearchService {
+public class SearchMarkService extends AbstractSearchService {
     @Autowired
-    public SearchService(@Qualifier("DbSearchStorage") SearchStorage searchStorage) {
+    public SearchMarkService(@Qualifier("DbMarkSearchStorage") SearchStorage searchStorage) {
         this.searchStorage = searchStorage;
     }
 }

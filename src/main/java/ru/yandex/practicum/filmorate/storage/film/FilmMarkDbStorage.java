@@ -11,42 +11,40 @@ import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.rateFilms.LikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.rateFilms.MarkDbStorage;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-@Component("FilmDbStorage")
-public class FilmDbStorage extends AbstractFilmDbStorage {
-    LikeDbStorage likeDbStorage;
+@Component("FilmMarkDbStorage")
+public class FilmMarkDbStorage extends AbstractFilmDbStorage {
+    MarkDbStorage markDbStorage;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService,
-                         DirectorDbStorage directorStorage, LikeDbStorage likeDbStorage) {
+    public FilmMarkDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService,
+                             DirectorDbStorage directorStorage, MarkDbStorage markDbStorage) {
         super(jdbcTemplate, mpaService, genreService, directorStorage);
-        this.likeDbStorage = likeDbStorage;
+        this.markDbStorage = markDbStorage;
     }
 
     @Override
     public List<Film> findAll() {
         String sql = "SELECT * FROM films";
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> {
-            Film film = Film.builder()
-                    .id(rs.getLong("id"))
-                    .name(rs.getString("name"))
-                    .description(rs.getString("description"))
-                    .releaseDate(rs.getDate("release_Date").toLocalDate())
-                    .duration(rs.getInt("duration"))
-                    .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
-                    .mpa(new MPA(rs.getInt("rating_id"),
-                            mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
-                    .directors(directorStorage.getDirectorsByFilmId(rs.getInt("id")))
-                    .build();
-            film.setVoytedUsers(new HashSet<>(likeDbStorage.getLikes(rs.getLong("id"))));
-            return film;
-        }
-        ));
+        return jdbcTemplate.query(sql, ((rs, rowNum) ->
+                Film.builder()
+                        .id(rs.getLong("id"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .releaseDate(rs.getDate("release_Date").toLocalDate())
+                        .duration(rs.getInt("duration"))
+                        .points(markDbStorage.getPoints(rs.getLong("id")))
+                        .genres(new HashSet<>(genreService.getGenresByFilmId(rs.getLong("id"))))
+                        .mpa(new MPA(rs.getInt("rating_id"),
+                                mpaService.getMpaRateById(rs.getInt("rating_id")).getName()))
+                        .directors(directorStorage.getDirectorsByFilmId(rs.getInt("id")))
+                        .build())
+        );
     }
 
     @Override
@@ -65,12 +63,12 @@ public class FilmDbStorage extends AbstractFilmDbStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_Date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
+                    .points(markDbStorage.getPoints(filmId))
                     .genres(new HashSet<>(genreService.getGenresByFilmId(filmId)))
                     .mpa(new MPA(filmRows.getInt("rating_id"),
                             mpaService.getMpaRateById(filmRows.getInt("rating_id")).getName()))
                     .directors(directorStorage.getDirectorsByFilmId(filmId))
                     .build();
-            film.setVoytedUsers(new HashSet<>(likeDbStorage.getLikes(filmId)));
         } else {
             throw new NotFoundException("Film Not founded by id" + filmId);
         }
